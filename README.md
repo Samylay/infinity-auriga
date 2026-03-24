@@ -2,7 +2,7 @@
 
 Enhanced grades UI for [Auriga](https://auriga.epita.fr) (EPITA). Replaces the default interface with a cleaner, faster grade viewer with weighted averages and change tracking.
 
-Fork of [Litarvan/infinity-pegasus](https://github.com/Litarvan/infinity-pegasus).
+Fork of [infinity-pegasus](https://github.com/Litarvan/infinity-pegasus) by the GOATed [Litarvan](https://github.com/Litarvan).
 
 ## Install
 
