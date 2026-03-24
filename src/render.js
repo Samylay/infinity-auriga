@@ -369,12 +369,11 @@ export function renderApp(container, { name, marks, averages, filters, filtersVa
             const info = h('div', { class: 'info' });
             const infoTop = h('div', { class: 'top' });
 
-            // Code as bold ID, resolved name below
-            infoTop.appendChild(h('div', { class: 'id' }, subject.id.replace(/_/g, ' ')));
-            const resolvedName = subject.name !== subject.id.replace(/_/g, ' ') ? subject.name : '';
-            if (resolvedName) {
-                infoTop.appendChild(h('div', { class: 'name' }, resolvedName));
-            }
+            // Show the best available name
+            const displayName = isSingle
+                ? subject.marks[0].name
+                : (subject.name !== subject.id.replace(/_/g, ' ') ? subject.name : subject.id.replace(/_/g, ' '));
+            infoTop.appendChild(h('div', { class: 'id' }, displayName));
             info.appendChild(infoTop);
 
             const infoBottom = h('div', { class: 'bottom' });
