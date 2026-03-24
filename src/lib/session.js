@@ -1,42 +1,51 @@
 import { getName } from './auriga/auth.js';
 import { getMarks, getMarksFilters } from './auriga/marks.js';
 import { getUpdates } from './updates.js';
+import { loadCoefficients, applyCoefficients } from './coefficients/index.js';
 
 /**
- * Load initial session state: user name, filters, and saved filter values.
+ * Load initial session: user name, available filters, last selection.
  */
 export async function loadSession() {
     const name = await getName().catch(() => 'Etudiant');
     const filters = await getMarksFilters();
 
-    let filtersValues = {};
     const saved = localStorage.getItem('auriga_filters');
-    if (saved) {
-        filtersValues = JSON.parse(saved);
-    } else if (filters[0]?.values.length > 0) {
-        filtersValues = { semester: filters[0].values.at(-1).value };
-    }
+    const filtersValues = saved
+        ? JSON.parse(saved)
+        : filters[0]?.values.length > 0
+            ? { semester: filters[0].values.at(-1).value }
+            : {};
 
     return { name, filters, filtersValues };
 }
 
 /**
- * Fetch marks and updates for the given filter values.
- * Returns the data needed to render the app.
+ * Fetch marks, apply coefficient overrides, compute updates.
  */
 export async function fetchMarksAndUpdates(filtersValues) {
     const result = await getMarks(filtersValues);
-    const updates = await getUpdates(filtersValues, result.marks);
+    const marks = result.marks;
+
+    // Detect track from grade codes (e.g. "FISA")
+    const firstCode = marks.flatMap(m => m.subjects.flatMap(s => s.marks)).find(m => m._code)?._code;
+    const track = firstCode?.split('_')[3] ?? null;
+
+    // Load & apply coefficient overrides (falls back to API values)
+    const overrides = track ? await loadCoefficients(filtersValues.semester, track) : null;
+    const { average } = applyCoefficients(marks, overrides);
+
+    const updates = await getUpdates(filtersValues, marks);
 
     return {
-        marks: result.marks,
-        averages: { student: result.average, promo: result.classAverage },
+        marks,
+        averages: { student: average, promo: result.classAverage },
         updates,
     };
 }
 
 /**
- * Persist semester filter selection to localStorage.
+ * Persist semester selection.
  */
 export function saveSemesterFilter(value) {
     const filtersValues = { semester: value };
