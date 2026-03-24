@@ -178,31 +178,7 @@ export function buildGradeTree(gradeLines, nameLookup) {
     // Convert Maps to arrays and compute averages
     const result = [];
     for (const [, mod] of modules) {
-        const subjects = [];
-        for (const [, sub] of mod.subjects) {
-            const validMarks = sub.marks.filter(m => m.value != null && m.value > 0.01);
-            if (validMarks.length > 0) {
-                const totalWeight = validMarks.reduce((s, m) => s + m.coefficient, 0);
-                sub.average = validMarks.reduce((s, m) => s + m.value * m.coefficient, 0) / totalWeight;
-            }
-
-            const coeffSum = sub.marks.reduce((s, m) => s + m.coefficient, 0);
-            if (coeffSum > 0) {
-                for (const m of sub.marks) {
-                    m.coefficient = m.coefficient / coeffSum;
-                }
-            }
-
-            subjects.push(sub);
-        }
-
-        const validSubjects = subjects.filter(s => s.average != null);
-        if (validSubjects.length > 0) {
-            const totalCoeff = validSubjects.reduce((s, sub) => s + sub.coefficient, 0);
-            mod.average = validSubjects.reduce((s, sub) => s + sub.average * sub.coefficient, 0) / totalCoeff;
-        }
-
-        mod.subjects = subjects;
+        mod.subjects = [...mod.subjects.values()];
         result.push(mod);
     }
 

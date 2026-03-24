@@ -23,7 +23,6 @@ a { color: inherit; text-decoration: inherit; }
     --font-header: clamp(20px, 3vw, 32px);
     --font-body: clamp(13px, 1.5vw, 18px);
 
-    font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
     font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;

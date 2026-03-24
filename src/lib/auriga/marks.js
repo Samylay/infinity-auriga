@@ -83,18 +83,13 @@ export async function getMarks(filters) {
 
     const filteredSynthesis = synthesisLines.filter(line => {
         const code = line[2];
-        return code && code.startsWith(semesterPrefix) && code.includes(`_${semester}`);
+        return code && code.startsWith(semesterPrefix) && code.includes(`_${semester}_`);
     });
 
     // Use ALL synthesis lines for name resolution (cross-semester names like CS_CN → "Concevoir")
     // but filtered synthesis for averages
     const nameLookup = buildNameLookup(synthesisLines);
     const marks = buildGradeTree(filteredGrades, nameLookup);
-    const validModules = marks.filter(m => m.average != null);
-    let average = null;
-    if (validModules.length > 0) {
-        average = validModules.reduce((s, m) => s + m.average, 0) / validModules.length;
-    }
 
     // Extract promo average from synthesis data (avgPreRatt field)
     let classAverage = null;
@@ -107,7 +102,6 @@ export async function getMarks(filters) {
     }
 
     return {
-        average,
         classAverage,
         marks,
     };
