@@ -368,7 +368,13 @@ export function renderApp(container, { name, marks, averages, filters, filtersVa
             const info = h('div', { class: 'info' });
 
             const infoTop = h('div', { class: 'top' });
-            infoTop.appendChild(h('div', { class: 'id' }, subject.name));
+            // Show short code as the bold ID, resolved name below (if different)
+            const displayId = subject.id.replace(/_/g, ' ');
+            const displayName = subject.name !== subject.id.replace(/_/g, ' ') ? subject.name : '';
+            infoTop.appendChild(h('div', { class: 'id' }, displayId));
+            if (displayName) {
+                infoTop.appendChild(h('div', { class: 'name' }, displayName.length > 30 ? displayName.slice(0, 28) + '...' : displayName));
+            }
             info.appendChild(infoTop);
 
             const infoBottom = h('div', { class: 'bottom' });
