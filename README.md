@@ -8,11 +8,13 @@ Fork of [infinity-pegasus](https://github.com/Litarvan/infinity-pegasus) by the 
 
 ## Install
 
-1. Install [Tampermonkey](https://www.tampermonkey.net/) (Chrome / Firefox / Edge)
-2. **[Click here to install Infinity Auriga](https://raw.githubusercontent.com/KazeTachinuu/infinity-auriga/master/dist-userscript/infinity-auriga.user.js)**
-3. Go to [auriga.epita.fr](https://auriga.epita.fr)
+> **Requires [Tampermonkey](https://www.tampermonkey.net/)** (Chrome / Firefox / Edge)
 
-Auto-updates via Tampermonkey. Toggle between Infinity and classic Auriga with the switcher in the bottom-left.
+[![Install Infinity Auriga](https://img.shields.io/badge/Install-Infinity_Auriga-44b732?style=for-the-badge&logo=tampermonkey)](https://raw.githubusercontent.com/KazeTachinuu/infinity-auriga/master/dist-userscript/infinity-auriga.user.js)
+
+Click the button above — Tampermonkey will open an install page. Click **Install**. Done.
+
+Auto-updates are built-in. A toggle in the bottom-left lets you switch back to classic Auriga anytime.
 
 ## Features
 
