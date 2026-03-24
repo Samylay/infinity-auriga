@@ -3,6 +3,7 @@
 // @namespace    infinity-auriga
 // @version      3.0
 // @description  Capture Auriga API responses for Infinity Auriga development
+// @author       KazeTachinuu
 // @match        https://auriga.epita.fr/*
 // @grant        none
 // @run-at       document-idle
