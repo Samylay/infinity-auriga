@@ -194,6 +194,7 @@ hr.separator { width: 100%; margin-top: 25px; opacity: .3; border-bottom: 0; bor
 .subject .marks .mark .name { display: inline-block; margin-left: 15px; overflow: hidden; text-overflow: ellipsis; }
 .subject .marks .mark .value { justify-content: flex-end; margin-left: 1px; font-weight: bold; }
 .subject .marks .mark .class-average { margin-left: 10px; }
+.coeff-override { margin-left: 6px; color: var(--accent); font-weight: 600; font-size: 0.85em; }
 
 .no-marks { flex-grow: 1; justify-content: center; align-items: center; width: 100%; font-size: 28px; }
 

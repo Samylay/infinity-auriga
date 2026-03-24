@@ -46,6 +46,7 @@ export function applyCoefficients(marks, overrides) {
             for (const mark of sub.marks) {
                 if (overrides && mark._code && overrides.has(mark._code)) {
                     mark.coefficient = overrides.get(mark._code);
+                    mark._overridden = true;
                 }
                 // If no override and API gave 100 (uniform), default to 1
                 if (mark.coefficient === 100) mark.coefficient = 1;
@@ -74,9 +75,10 @@ export function applyCoefficients(marks, overrides) {
 
             sub.average = subWeight > 0 ? subTotal / subWeight : null;
 
-            // Normalize coefficients for display (fractions)
+            // Save raw coefficients, then normalize for display (fractions)
             if (subWeight > 0) {
                 for (const mark of sub.marks) {
+                    mark._rawCoefficient = mark.coefficient;
                     mark.coefficient = mark.coefficient / subWeight;
                 }
             }

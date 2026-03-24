@@ -217,6 +217,9 @@ function renderSubject(subject, moduleId) {
         const meta = [];
         if (mark.classAverage != null) meta.push(`moyenne: ${formatGrade(mark.classAverage)}`);
         if (!hasEqualCoefficients(subject)) meta.push(`${Math.round(mark.coefficient * 100)}%`);
+        const overriddenEl = mark._overridden && mark._rawCoefficient != null
+            ? h('span', { class: 'coeff-override' }, `\u00d7${mark._rawCoefficient}`)
+            : null;
 
         // Strip subject name prefix from mark name to avoid redundancy
         let markName = mark.name;
@@ -232,8 +235,9 @@ function renderSubject(subject, moduleId) {
                 '\u00a0:\u00a0',
                 h('div', { class: 'value' }, h('span', { class: 'itself', style: { color: gradeColor(mark.value) } }, formatGrade(mark.value)), '\u00a0/ 20')
             ),
-            ...(meta.length ? [h('div', { class: 'class-average' },
-                h('span', { class: 'parenthesis' }, '('), meta.join(', '), h('span', { class: 'parenthesis' }, ')')
+            ...(meta.length || overriddenEl ? [h('div', { class: 'class-average' },
+                ...(meta.length ? [h('span', { class: 'parenthesis' }, '('), meta.join(', '), h('span', { class: 'parenthesis' }, ')')] : []),
+                ...(overriddenEl ? [overriddenEl] : [])
             )] : [])
         );
     });
