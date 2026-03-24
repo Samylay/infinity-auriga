@@ -52,7 +52,7 @@ Copy this template:
  * Coefficients — S?? TRACK YEAR
  *
  * Only list exams whose coefficient is NOT 1.
- * Key = full exam code from the "Composant pédagogique" column.
+ * Key = full exam code from the "Épreuve" column on Auriga.
  * Value = real coefficient.
  */
 export default {

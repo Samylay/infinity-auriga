@@ -2,31 +2,22 @@
 
 ## Auriga Capture
 
-`auriga-capture.user.js` is a Tampermonkey script that captures Auriga API responses for local development.
+Tampermonkey script that captures Auriga API responses for local development.
 
-### Usage
+### Setup
 
-1. Install the script in Tampermonkey (drag the file or paste its contents)
+1. Install [`auriga-capture.user.js`](auriga-capture.user.js) in Tampermonkey
 2. Go to [auriga.epita.fr](https://auriga.epita.fr) and log in
-3. Navigate to your **grades page** — the script intercepts all API calls automatically
-4. A purple panel in the bottom-right shows how many calls were captured
-5. Click **Download API Only** to save the captured data
-
-### Setting up local dev
-
-The file downloads as `auriga-capture.json`. Move it into this `tools/` directory:
-
-```
-tools/auriga-capture.json
-```
-
-Then run `bun run dev` — the mock API server serves this data with simulated latency.
+3. Navigate to your grades page
+4. A purple panel appears in the bottom-right showing captured API calls
+5. Click **Download** — saves as `auriga-capture.json`
+6. Move the file here: `tools/auriga-capture.json`
+7. Run `bun run dev` — done
 
 ### What it captures
 
-- All XHR and fetch requests to `/api/*` and Keycloak token endpoints
+- All requests to `/api/*` (grades, synthesis, menus, user info)
 - POST request bodies (search filters)
-- Response headers
-- Skips static assets (SVGs, fonts, i18n)
+- Skips static assets and non-API endpoints
 
-The captured JSON files contain your real grades and are gitignored.
+The JSON contains your real grades and is gitignored.
