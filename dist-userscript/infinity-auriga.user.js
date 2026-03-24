@@ -363,7 +363,6 @@
 					id: moduleId,
 					_code: moduleCode,
 					name,
-					credits: 0,
 					average: null,
 					classAverage: null,
 					subjects: /* @__PURE__ */ new Map()
@@ -767,7 +766,7 @@
 		return {
 			name,
 			filters,
-			filtersValues: saved ? JSON.parse(saved) : filters[0]?.values.length > 0 ? { semester: filters[0].values.at(-1).value } : {}
+			filtersValues: saved ? JSON.parse(saved) : filters[0]?.values.length > 0 ? { semester: filters[0].values[0].value } : {}
 		};
 	}
 	/**
@@ -782,7 +781,7 @@
 		const coeffData = track ? await loadCoefficients(filtersValues.semester, track) : null;
 		const { average } = applyCoefficients(marks, coeffData?.overrides ?? null);
 		status?.step("Calcul des changements...");
-		const updates = await getUpdates(filtersValues, marks);
+		const updates = getUpdates(filtersValues, marks);
 		return {
 			marks,
 			averages: {
@@ -1348,7 +1347,7 @@
 			return;
 		}
 		await waitForToken();
-		Promise.resolve().then(() => /* @__PURE__ */ __toESM(require_style(), 1));
+		await Promise.resolve().then(() => /* @__PURE__ */ __toESM(require_style(), 1));
 		document.title = "Infinity Auriga";
 		while (document.body.firstChild) document.body.removeChild(document.body.firstChild);
 		for (const el of document.querySelectorAll("link[rel=\"stylesheet\"], style:not([data-infinity])")) el.remove();

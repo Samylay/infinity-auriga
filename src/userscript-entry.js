@@ -22,7 +22,7 @@ async function main() {
     await waitForToken();
 
     // Auth confirmed — take over the page
-    import('./style.css');
+    await import('./style.css');
 
     document.title = 'Infinity Auriga';
     while (document.body.firstChild) document.body.removeChild(document.body.firstChild);

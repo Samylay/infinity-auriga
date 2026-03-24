@@ -145,7 +145,6 @@ export function buildGradeTree(grades, nameLookup) {
                 id: moduleId,
                 _code: moduleCode,
                 name,
-                credits: 0,
                 average: null,
                 classAverage: null,
                 subjects: new Map(),

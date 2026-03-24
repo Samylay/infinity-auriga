@@ -16,7 +16,7 @@ export async function loadSession(status) {
     const filtersValues = saved
         ? JSON.parse(saved)
         : filters[0]?.values.length > 0
-            ? { semester: filters[0].values.at(-1).value }
+            ? { semester: filters[0].values[0].value }
             : {};
 
     return { name, filters, filtersValues };
@@ -40,7 +40,7 @@ export async function fetchMarksAndUpdates(filtersValues, status) {
     const { average } = applyCoefficients(marks, coeffData?.overrides ?? null);
 
     status?.step('Calcul des changements...');
-    const updates = await getUpdates(filtersValues, marks);
+    const updates = getUpdates(filtersValues, marks);
 
     return {
         marks,
