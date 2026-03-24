@@ -4,6 +4,8 @@ Enhanced grades UI for [Auriga](https://auriga.epita.fr) (EPITA).
 
 Fork of [infinity-pegasus](https://github.com/Litarvan/infinity-pegasus) by the GOATed [Litarvan](https://github.com/Litarvan).
 
+![Infinity Auriga](docs/img/screenshot.png)
+
 ## Install
 
 1. Install [Tampermonkey](https://www.tampermonkey.net/) (Chrome / Firefox / Edge)
@@ -39,6 +41,8 @@ bun install
 bun run dev                # Dev server with mock API (localhost:5173)
 bun run build:userscript   # Build Tampermonkey script → dist-userscript/
 ```
+
+The dev server needs `tools/auriga-capture.json` for mock data. Use `tools/auriga-capture.user.js` (Tampermonkey) to capture your own from Auriga.
 
 ## License
 

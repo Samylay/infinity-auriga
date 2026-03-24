@@ -35,7 +35,7 @@ function html(tag, attrs, rawHtml) {
     return el;
 }
 
-function gc(value) {
+function gradeColor(value) {
     if (value === 0.01) return '#666670';
     if (value == null) return 'auto';
     const yellow = [255, 206, 40];
@@ -50,14 +50,14 @@ function gc(value) {
     return result;
 }
 
-function fmt(value) {
+function formatGrade(value) {
     if (value === 0.01) return 'Abs.';
     if (value !== 0 && !value) return '--,--';
     return value.toFixed(2).replace('.', ',');
 }
 
 function gradeSpan(value) {
-    return h('span', { class: 'value', style: { color: gc(value) } }, fmt(value));
+    return h('span', { class: 'value', style: { color: gradeColor(value) } }, formatGrade(value));
 }
 
 function signSvg(type, value, old) {
@@ -182,7 +182,7 @@ function renderUpdate(upd) {
         ),
         h('div', { class: 'mark' },
             h('div', { class: 'point' }),
-            ...(hasValue && hasOld ? [h('div', { class: 'from' }, fmt(upd.old)), html('div', { class: 'update-arrow' }, UpdateArrowSvg)] : []),
+            ...(hasValue && hasOld ? [h('div', { class: 'from' }, formatGrade(upd.old)), html('div', { class: 'update-arrow' }, UpdateArrowSvg)] : []),
             h('div', { class: 'to' }, gradeSpan(displayValue), '\u00a0/ 20'),
             ...(sign ? [html('div', { class: 'type-sign' }, sign)] : [])
         )
@@ -200,8 +200,8 @@ function renderSubject(subject, moduleId) {
     const codeLabel = useNameAsLabel ? fullName : rawCode;
 
     const metaParts = [];
-    if (subject.classAverage != null) metaParts.push(`promo: ${fmt(subject.classAverage)}`);
-    if (subject.coefficient != null && subject.coefficient !== 1) metaParts.push(`coeff. ${fmt(subject.coefficient)}`);
+    if (subject.classAverage != null) metaParts.push(`promo: ${formatGrade(subject.classAverage)}`);
+    if (subject.coefficient != null && subject.coefficient !== 1) metaParts.push(`coeff. ${formatGrade(subject.coefficient)}`);
 
     const info = h('div', { class: 'info' },
         h('div', { class: 'top' }, h('div', { class: 'id' }, codeLabel)),
@@ -215,7 +215,7 @@ function renderSubject(subject, moduleId) {
     // Right side: always show marks panel with full name header
     const marksContent = subject.marks.map(mark => {
         const meta = [];
-        if (mark.classAverage != null) meta.push(`moyenne: ${fmt(mark.classAverage)}`);
+        if (mark.classAverage != null) meta.push(`moyenne: ${formatGrade(mark.classAverage)}`);
         if (!hasEqualCoefficients(subject)) meta.push(`${Math.round(mark.coefficient * 100)}%`);
 
         // Strip subject name prefix from mark name to avoid redundancy
@@ -230,7 +230,7 @@ function renderSubject(subject, moduleId) {
             h('div', { class: 'line' },
                 h('div', { class: 'name' }, markName),
                 '\u00a0:\u00a0',
-                h('div', { class: 'value' }, h('span', { class: 'itself', style: { color: gc(mark.value) } }, fmt(mark.value)), '\u00a0/ 20')
+                h('div', { class: 'value' }, h('span', { class: 'itself', style: { color: gradeColor(mark.value) } }, formatGrade(mark.value)), '\u00a0/ 20')
             ),
             ...(meta.length ? [h('div', { class: 'class-average' },
                 h('span', { class: 'parenthesis' }, '('), meta.join(', '), h('span', { class: 'parenthesis' }, ')')
@@ -284,9 +284,9 @@ export function renderApp(container, { name, marks, averages, filters, filtersVa
                 h('div', { class: 'name' }, mod.name),
                 h('div', { class: 'point' }),
                 h('div', { class: 'bottom' },
-                    h('span', { class: 'average', style: { color: gc(mod.average) } }, fmt(mod.average)),
+                    h('span', { class: 'average', style: { color: gradeColor(mod.average) } }, formatGrade(mod.average)),
                     h('span', { class: 'max' }, '\u00a0/ 20'),
-                    ...(mod.classAverage != null ? [h('span', { class: 'class-average' }, `(promo: ${fmt(mod.classAverage)})`)] : [])
+                    ...(mod.classAverage != null ? [h('span', { class: 'class-average' }, `(promo: ${formatGrade(mod.classAverage)})`)] : [])
                 )
             ),
             h('hr', { class: 'bottom-line' })
@@ -318,7 +318,7 @@ export function renderApp(container, { name, marks, averages, filters, filtersVa
                         h('div', { class: 'name' }, e.label),
                         h('div', { class: 'point small' }),
                         h('div', { class: 'mark' },
-                            h('span', { class: 'value', style: { color: e.colored ? gc(e.value) : 'auto' } }, fmt(e.value)),
+                            h('span', { class: 'value', style: { color: e.colored ? gradeColor(e.value) : 'auto' } }, formatGrade(e.value)),
                             '\u00a0/ 20'
                         )
                     )
