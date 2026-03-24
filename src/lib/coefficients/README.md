@@ -6,17 +6,17 @@ Auriga treats all exams as equally weighted. This directory contains the **real*
 
 ### 1. Find your exam codes
 
-Open [auriga.epita.fr](https://auriga.epita.fr), go to your grades, then open DevTools (`F12`) and go to the **Network** tab:
+Go to **Mes notes (éval)** on [auriga.epita.fr](https://auriga.epita.fr):
 
-![Step 1 — Open DevTools on Auriga](../../../docs/img/step1-open-devtools.png)
+![Step 1 — Navigate to Mes notes (éval)](../../../docs/img/step1-navigate.png)
 
-Look for `POST` requests to `searchResult`. Click one, then look at the **Response** — each grade line contains the exam code:
+Click the **eye icon** to show columns, and enable **Composant pédagogique**. The exam codes appear in the first column:
 
-![Step 2 — Find exam codes in the response](../../../docs/img/step2-find-codes.png)
+![Step 2 — Show the Composant pédagogique column](../../../docs/img/step2-show-codes.png)
 
-> **Don't see the requests?** Make sure you have the Network tab open *before* navigating to your grades. If needed, refresh the page with DevTools open:
+> **Don't see the same screen?** Make sure you're on the "éval" tab, not the synthesis view:
 >
-> ![Troubleshoot — Refresh with DevTools open](../../../docs/img/step3-troubleshoot.png)
+> ![Troubleshoot](../../../docs/img/step3-troubleshoot.png)
 
 ### Exam code anatomy
 
@@ -52,7 +52,7 @@ Copy this template:
  * Coefficients — S?? TRACK YEAR
  *
  * Only list exams whose coefficient is NOT 1.
- * Key = full exam code from Auriga API.
+ * Key = full exam code from the "Composant pédagogique" column.
  * Value = real coefficient.
  */
 export default {
