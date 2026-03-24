@@ -8,7 +8,7 @@ Auriga treats all exams as equally weighted. This directory contains the **real*
 
 Go to **Mes notes (éval)** on [auriga.epita.fr](https://auriga.epita.fr):
 
-![Step 1 — Navigate to Mes notes (éval)](../../../docs/img/step1-show-columns.png)
+![Step 1 — Navigate to Mes notes (éval)](../../../docs/img/step1-navigate.png)
 
 The exam codes are in the **Épreuve** column. Notice how **Coef** is `100,00` for everything — that's the problem we fix:
 
