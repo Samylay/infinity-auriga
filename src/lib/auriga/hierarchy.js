@@ -118,20 +118,23 @@ export function buildGradeTree(gradeLines, nameLookup) {
 
         if (!mod.subjects.has(subject.code)) {
             let info = nameLookup.get(subject.code);
-            // Cross-semester name resolution: try exact suffix, then partial
+            // Cross-semester name resolution
             if (!info) {
                 const suffix = '_' + subject.id;
+                let bestPartial = null;
+                let bestPartialLen = Infinity;
                 for (const [code, val] of nameLookup) {
-                    // Exact match: code ends with _AG_ANGLA
-                    if (code.endsWith(suffix) && val.name.length <= 40) {
-                        info = val;
-                        break;
-                    }
-                    // Partial match: code contains _AG_ANGLA_ (has extra depth like _3, _4)
-                    if (!info && code.includes(suffix + '_') && val.name.length <= 40) {
-                        info = val;
+                    if (val.name.length > 40) continue;
+                    // Exact suffix: code ends with _CS_CN (best)
+                    if (code.endsWith(suffix)) { info = val; break; }
+                    // Partial: code has _CS_CN_ somewhere - prefer shortest code (closest level)
+                    const idx = code.indexOf(suffix + '_');
+                    if (idx !== -1 && code.length < bestPartialLen) {
+                        bestPartial = val;
+                        bestPartialLen = code.length;
                     }
                 }
+                if (!info && bestPartial) info = bestPartial;
             }
             mod.subjects.set(subject.code, {
                 id: subject.id,
