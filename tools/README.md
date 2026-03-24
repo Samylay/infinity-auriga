@@ -4,15 +4,20 @@
 
 Tampermonkey script that captures Auriga API responses for local development.
 
-### Setup
+### Install
 
-1. Install [`auriga-capture.user.js`](auriga-capture.user.js) in Tampermonkey
-2. Go to [auriga.epita.fr](https://auriga.epita.fr) and log in
-3. Navigate to your grades page
-4. A purple panel appears in the bottom-right showing captured API calls
-5. Click **Download** — saves as `auriga-capture.json`
-6. Move the file here: `tools/auriga-capture.json`
-7. Run `bun run dev` — done
+> **Requires [Tampermonkey](https://www.tampermonkey.net/)**
+
+[![Install Auriga Capture](https://img.shields.io/badge/Install-Auriga_Capture-673ab7?style=for-the-badge&logo=tampermonkey)](https://raw.githubusercontent.com/KazeTachinuu/infinity-auriga/master/tools/auriga-capture.user.js)
+
+### Usage
+
+1. Go to [auriga.epita.fr](https://auriga.epita.fr) and log in
+2. Navigate to your grades page
+3. A purple panel appears in the bottom-right showing captured API calls
+4. Click **Download** — saves as `auriga-capture.json`
+5. Move the file to `tools/auriga-capture.json`
+6. Run `bun run dev`
 
 ### What it captures
 
