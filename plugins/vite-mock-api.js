@@ -42,13 +42,17 @@ export default function mockApiPlugin() {
                 req.on('data', chunk => body += chunk);
                 req.on('end', () => {
                     const match = findMatch(method, url);
-                    if (match) {
-                        res.setHeader('Content-Type', 'application/json');
-                        res.end(typeof match.response === 'string' ? match.response : JSON.stringify(match.response));
-                    } else {
-                        res.statusCode = 404;
-                        res.end(JSON.stringify({ error: 'No mock data' }));
-                    }
+                    // Simulate network latency (300-800ms)
+                    const delay = 300 + Math.random() * 500;
+                    setTimeout(() => {
+                        if (match) {
+                            res.setHeader('Content-Type', 'application/json');
+                            res.end(typeof match.response === 'string' ? match.response : JSON.stringify(match.response));
+                        } else {
+                            res.statusCode = 404;
+                            res.end(JSON.stringify({ error: 'No mock data' }));
+                        }
+                    }, delay);
                 });
             });
         },

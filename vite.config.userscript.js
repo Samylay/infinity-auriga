@@ -13,6 +13,6 @@ export default defineConfig({
         },
         outDir: 'dist-userscript',
         target: ['es2020'],
-        minify: 'esbuild',
+        minify: false,
     },
 });

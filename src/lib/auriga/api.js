@@ -1,6 +1,11 @@
 const AURIGA_API = '/api';
 
 let _accessToken = null;
+let _onApiRequest = null;
+
+export function setApiRequestHook(fn) {
+    _onApiRequest = fn;
+}
 
 export function setAccessToken(token) {
     _accessToken = token;
@@ -16,6 +21,7 @@ export async function apiFetch(path, options = {}, _retried = false) {
     }
 
     const url = path.startsWith('http') ? path : `${AURIGA_API}${path}`;
+    _onApiRequest?.(url);
     const response = await fetch(url, {
         ...options,
         headers: {

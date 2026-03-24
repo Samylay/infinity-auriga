@@ -1,42 +1,62 @@
-import './style.css';
-import { setAccessToken } from './lib/auriga/api.js';
+import { setAccessToken, setApiRequestHook } from './lib/auriga/api.js';
 import { isLogged } from './lib/auriga/auth.js';
-import { loadSession, fetchMarksAndUpdates, saveSemesterFilter } from './lib/session.js';
-import { renderApp, renderSpinner } from './render.js';
+import { isInfinityEnabled, setupToggle } from './lib/toggle.js';
 
 if (window.location.hostname === 'localhost') {
     setAccessToken('dev-mock-token');
 }
 
-const container = document.getElementById('app');
-let state = { name: null, marks: [], averages: {}, filters: [], filtersValues: {}, updates: [] };
+async function main() {
+    if (!isInfinityEnabled()) {
+        // Show mock Auriga page + toggle
+        const app = document.getElementById('app');
+        app.remove();
+        const mock = document.createElement('div');
+        mock.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;height:100dvh;font-family:system-ui;background:#f0f1f3;color:#333;';
+        const title = document.createElement('div');
+        title.style.cssText = 'font-size:28px;font-weight:700;margin-bottom:12px;';
+        title.textContent = 'Auriga';
+        const sub = document.createElement('div');
+        sub.style.cssText = 'font-size:15px;color:#888;';
+        sub.textContent = 'Ceci est un aperçu de la page Auriga originale (mock)';
+        mock.append(title, sub);
+        document.body.appendChild(mock);
+        setupToggle('classic');
+        return;
+    }
 
-function showLoading(message) {
-    container.replaceChildren(renderSpinner(message));
-}
+    // Load Infinity
+    await import('./style.css');
+    const { renderApp, renderLoadingScreen } = await import('./render.js');
+    const { loadSession, fetchMarksAndUpdates, saveSemesterFilter } = await import('./lib/session.js');
 
-async function refresh() {
-    showLoading('Recuperation des notes...');
-    const data = await fetchMarksAndUpdates(state.filtersValues);
-    Object.assign(state, data);
-    renderApp(container, { ...state, onSemesterChange: changeSemester });
-}
+    const container = document.getElementById('app');
+    let state = { name: null, marks: [], averages: {}, filters: [], filtersValues: {}, updates: [] };
 
-function changeSemester(value) {
-    state.filtersValues = saveSemesterFilter(value);
-    refresh();
-}
+    setupToggle('infinity');
 
-async function load() {
-    showLoading('Chargement...');
+    async function refresh() {
+        const status = renderLoadingScreen(container);
+        setApiRequestHook((url) => status.request(url));
+        const data = await fetchMarksAndUpdates(state.filtersValues, status);
+        Object.assign(state, data);
+        renderApp(container, { ...state, onSemesterChange: changeSemester });
+    }
+
+    function changeSemester(value) {
+        state.filtersValues = saveSemesterFilter(value);
+        refresh();
+    }
+
     if (!isLogged()) return;
 
-    const session = await loadSession();
+    const status = renderLoadingScreen(container);
+    setApiRequestHook((url) => status.request(url));
+    const session = await loadSession(status);
     Object.assign(state, session);
     await refresh();
 }
 
-load().catch(err => {
+main().catch(err => {
     console.error('[Infinity Auriga]', err);
-    container.textContent = 'Erreur: ' + err.message;
 });

@@ -6,8 +6,10 @@ import { loadCoefficients, applyCoefficients } from './coefficients/index.js';
 /**
  * Load initial session: user name, available filters, last selection.
  */
-export async function loadSession() {
+export async function loadSession(status) {
+    status?.step('Récupération du profil...');
     const name = await getName().catch(() => 'Etudiant');
+    status?.step('Récupération des filtres...');
     const filters = await getMarksFilters();
 
     const saved = localStorage.getItem('auriga_filters');
@@ -23,7 +25,8 @@ export async function loadSession() {
 /**
  * Fetch marks, apply coefficient overrides, compute updates.
  */
-export async function fetchMarksAndUpdates(filtersValues) {
+export async function fetchMarksAndUpdates(filtersValues, status) {
+    status?.step('Récupération des notes...');
     const result = await getMarks(filtersValues);
     const marks = result.marks;
 
@@ -32,9 +35,11 @@ export async function fetchMarksAndUpdates(filtersValues) {
     const track = firstCode?.split('_')[3] ?? null;
 
     // Load & apply coefficient overrides (falls back to API values)
+    status?.step('Application des coefficients...');
     const overrides = track ? await loadCoefficients(filtersValues.semester, track) : null;
     const { average } = applyCoefficients(marks, overrides);
 
+    status?.step('Calcul des changements...');
     const updates = await getUpdates(filtersValues, marks);
 
     return {
