@@ -108,8 +108,8 @@ button:not(.opaque):active, a:not(.opaque):active, .clickable:not(.opaque):activ
 .content { flex-direction: column; flex-grow: 1; align-items: flex-start; padding: 5px var(--content-px); margin-bottom: 25px; overflow-y: auto; }
 
 /* ===== SECTION HEADERS ===== */
-.header { flex-direction: column; position: relative; z-index: -1; font-weight: bold; font-size: var(--font-header); }
-.header hr { width: 100%; border-bottom: 0; border-color: var(--surface); }
+.header { flex-direction: column; position: relative; font-weight: bold; font-size: var(--font-header); }
+.header hr { width: 100%; border-bottom: 0; border-color: var(--surface); position: relative; z-index: -1; }
 
 /* ===== FILTERS / COMBOBOX ===== */
 .filters { justify-content: space-between; width: 100%; margin-bottom: clamp(30px, 4vw, 50px); }
@@ -195,6 +195,24 @@ hr.separator { width: 100%; margin-top: 25px; opacity: .3; border-bottom: 0; bor
 .subject .marks .mark .value { justify-content: flex-end; margin-left: 1px; font-weight: bold; }
 .subject .marks .mark .class-average { margin-left: 10px; }
 .coeff-override { margin-left: 6px; color: var(--accent); font-weight: 600; font-size: 0.85em; }
+
+/* ===== COPY CODE ===== */
+.copy-code { border-bottom: 1px dashed transparent; transition: border-color .15s; }
+.copy-code:hover { border-bottom-color: var(--text-muted); }
+
+.code-tooltip {
+    position: fixed; z-index: 9999;
+    padding: 4px 10px; border-radius: 4px;
+    background: var(--bg-dark); color: var(--text-muted);
+    font-size: 12px; font-weight: 500;
+    font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+    white-space: nowrap; pointer-events: none;
+    opacity: 0; transition: opacity .12s;
+}
+.code-tooltip.copied {
+    background: var(--accent); color: #fff;
+    font-family: inherit;
+}
 
 .no-marks { flex-grow: 1; justify-content: center; align-items: center; width: 100%; font-size: 28px; }
 
