@@ -1,18 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="29px" height="29px" viewBox="0 0 29 29" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>Group 4</title>
-    <g id="Main" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round">
-        <g id="Home-page" transform="translate(-1322.000000, -331.000000)" stroke="#44B728" stroke-width="3">
-            <g id="Content" transform="translate(440.000000, 0.000000)">
-                <g id="Header" transform="translate(66.000000, 66.000000)">
-                    <g id="Group" transform="translate(0.000000, 126.000000)">
-                        <g id="Group-4" transform="translate(830.335481, 153.812317) rotate(45.000000) translate(-830.335481, -153.812317) translate(821.388092, 144.917541)">
-                            <polyline id="Path-4" points="0 17.7895533 8.89477667 8.89477667 0 0"></polyline>
-                            <polyline id="Path-4" transform="translate(13.447388, 8.894777) scale(-1, 1) translate(-13.447388, -8.894777) " points="9 17.7895533 17.8947767 8.89477667 9 0"></polyline>
-                        </g>
-                    </g>
-                </g>
-            </g>
-        </g>
-    </g>
-</svg>
+<svg width="29" height="29" viewBox="0 0 29 29" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#44B728" stroke-width="3" stroke-linecap="round"><line x1="14.5" y1="2" x2="14.5" y2="27"/><line x1="2" y1="14.5" x2="27" y2="14.5"/></svg>

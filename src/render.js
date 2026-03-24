@@ -120,17 +120,9 @@ function renderComboBox(name, values, currentValue, onUpdate) {
 
     const selected = (values.find(v => v.value === currentValue) || { name: '...' }).name;
 
-    const box = html('div', { class: 'box clickable' },
-        `${selected} `
-    );
-    // Append the arrow SVG
-    const arrowContainer = document.createElement('span');
-    arrowContainer.innerHTML = ComboBoxArrowSvg;
-    box.appendChild(arrowContainer.firstElementChild || arrowContainer);
-    box.textContent = '';
+    const box = h('div', { class: 'box clickable' });
     box.appendChild(document.createTextNode(selected + ' '));
-    const arrowEl = document.createElement('span');
-    arrowEl.innerHTML = ComboBoxArrowSvg;
+    const arrowEl = html('span', {}, ComboBoxArrowSvg);
     box.appendChild(arrowEl.firstElementChild || arrowEl);
 
     let opened = false;
@@ -152,8 +144,7 @@ function renderComboBox(name, values, currentValue, onUpdate) {
                             // Update box text
                             box.textContent = '';
                             box.appendChild(document.createTextNode(choice.name + ' '));
-                            const newArrow = document.createElement('span');
-                            newArrow.innerHTML = ComboBoxArrowSvg;
+                            const newArrow = html('span', {}, ComboBoxArrowSvg);
                             box.appendChild(newArrow.firstElementChild || newArrow);
                             onUpdate(choice);
                         }
