@@ -1,8 +1,5 @@
-import { apiFetch, fetchAllSearchResults } from './api';
-import { buildNameLookup, buildGradeTree, parseExamCode } from './hierarchy';
-
-// progress was a Svelte store - now just a no-op
-const progress = { set() {} };
+import { apiFetch, fetchAllSearchResults } from './api.js';
+import { buildNameLookup, buildGradeTree, parseExamCode } from './hierarchy.js';
 
 let _menuConfig = null;
 
@@ -33,13 +30,8 @@ async function getMenuConfig() {
 let _cachedSynthesisLines = null;
 
 export async function getMarksFilters() {
-    progress.set('listing.documents');
-
     const config = await getMenuConfig();
     const synth = config.synthesis;
-
-    progress.set('listing.filters');
-
     const lines = await fetchAllSearchResults(synth.menuEntryId, synth.queryId);
     const semesters = new Map();
     for (const line of lines) {
@@ -74,13 +66,10 @@ export async function getMarks(filters) {
 
     const [semester, year] = semFilter.split('_');
     const semesterPrefix = `${year}_I_INF_`;
-    progress.set('fetching.summary');
 
     const config = await getMenuConfig();
     const grades = config.grades;
-
     const gradeLines = await fetchAllSearchResults(grades.menuEntryId, grades.queryId);
-    progress.set('reading.summary');
 
     const filteredGrades = gradeLines.filter(line => {
         const code = line[3];

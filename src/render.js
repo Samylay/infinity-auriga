@@ -1,6 +1,6 @@
-import { app } from './app';
+import { app } from './app.js';
 
-import NoisyVerticalGradient from './lib/ui/background';
+import NoisyVerticalGradient from './lib/ui/background.js';
 
 import topTriangle from './assets/images/top_triangle.svg?raw';
 import bottomTriangle from './assets/images/bottom_triangle.svg?raw';
@@ -176,7 +176,7 @@ function renderComboBox(name, values, currentValue, onUpdate) {
 /**
  * Render the spinner loading state.
  */
-function renderSpinner(message) {
+export function renderSpinner(message) {
     return h('div', { class: 'loading' },
         html('div', { class: 'spinner' }, SpinnerSvg),
         h('div', { class: 'subtitle' }, message || 'Chargement...')
@@ -218,7 +218,7 @@ function renderFooter() {
  * Main render function: generates the full Pegasus-style layout.
  */
 export function renderApp(container, { name, marks, averages, filters, filtersValues, updates, onSemesterChange }) {
-    while (container.firstChild) container.removeChild(container.firstChild);
+    container.replaceChildren();
 
     // === Background ===
     container.appendChild(renderBackground());

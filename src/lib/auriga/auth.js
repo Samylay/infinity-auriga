@@ -1,4 +1,4 @@
-import { setAccessToken, apiFetch, getAccessToken } from './api';
+import { setAccessToken, apiFetch, getAccessToken } from './api.js';
 
 let _userInfo = null;
 
