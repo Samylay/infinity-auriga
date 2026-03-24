@@ -4,21 +4,15 @@ Auriga treats all exams as equally weighted. This directory contains the **real*
 
 ## How to add coefficients for your semester
 
-### 1. Find your exam codes
+### 1. Find your codes
 
-Go to **Mes notes (éval)** on [auriga.epita.fr](https://auriga.epita.fr):
+**Hover** any module name, subject name, or mark name in Infinity Auriga — a tooltip shows its full code. **Click** to copy it to your clipboard.
 
-![Step 1 — Navigate to Mes notes (éval)](../../../docs/img/step1-navigate.png)
+Every copyable name has a <u>dashed underline</u> to indicate it's clickable.
 
-The exam codes are in the **Épreuve** column. Notice how **Coef** is `100,00` for everything — that's the problem we fix:
+![Hover a name to see its code, click to copy](../../../docs/img/copy-code.png)
 
-![Step 2 — Exam codes in the Épreuve column](../../../docs/img/step2-exam-codes.png)
-
-> **Don't see the Épreuve column?** Click the **eye icon** and enable it:
->
-> ![Click the eye icon to show the Épreuve column](../../../docs/img/step3-troubleshoot.png)
-
-### Exam code anatomy
+### Code anatomy
 
 ```
 2526_I_INF_FISA_S07_CS_GR_WS_EX

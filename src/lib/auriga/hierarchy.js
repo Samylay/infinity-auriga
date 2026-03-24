@@ -45,32 +45,20 @@ export function buildNameLookup(lines) {
 }
 
 /**
- * Find the best subject grouping level for a grade path.
+ * Find the subject grouping level for a grade path.
  *
- * Walks the path upward from one level above the leaf, looking for the
- * deepest code that has a name in the lookup. This groups related grades:
- *   CS_FR_MSE       -> subject = CS_FR ("Formaliser")
- *   CS_SAE_INT_PEN  -> subject = CS_SAE_INT ("Tests d'intrusions")
- *   CS_SAE_INT_MAS  -> subject = CS_SAE_INT ("Tests d'intrusions")  <- grouped!
- *   CS_CN_AI4SEC    -> subject = CS_CN (fallback, groups with COCO)
+ * Subject is always the first 2 path segments (Module > Subject):
+ *   CS_FR_MSE       -> subject = CS_FR
+ *   CS_SAE_INT_PEN  -> subject = CS_SAE
+ *   CS_SAE_INT_MAS  -> subject = CS_SAE  <- grouped!
+ *   CS_CN_AI4SEC    -> subject = CS_CN
  */
-function findSubjectLevel(prefix, path, nameLookup) {
-    // Start one level up from leaf to ensure grouping
-    for (let depth = path.length - 1; depth >= 2; depth--) {
-        const candidateId = path.slice(0, depth).join('_');
-        const candidateCode = `${prefix}_${candidateId}`;
-        if (nameLookup.has(candidateCode)) {
-            return { id: candidateId, code: candidateCode };
-        }
-    }
-
-    // Fallback: use first 2 segments if available
+function findSubjectLevel(prefix, path) {
     if (path.length >= 2) {
         const id = path.slice(0, 2).join('_');
         return { id, code: `${prefix}_${id}` };
     }
 
-    // Single segment: subject = module
     return { id: path[0] || 'TC', code: `${prefix}_${path[0] || 'TC'}` };
 }
 
@@ -118,7 +106,7 @@ export function buildGradeTree(gradeLines, nameLookup) {
         const moduleId = path[0] || 'TC';
         const moduleCode = `${prefix}_${moduleId}`;
 
-        const subject = findSubjectLevel(prefix, path, nameLookup);
+        const subject = findSubjectLevel(prefix, path);
 
         if (!modules.has(moduleCode)) {
             const info = resolveName(moduleCode, '_' + moduleId, nameLookup);
