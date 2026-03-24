@@ -46,14 +46,7 @@ bun install
 
 ### Get mock data
 
-The dev server replays real Auriga API responses. You need to capture them once:
-
-1. Install [`tools/auriga-capture.user.js`](tools/auriga-capture.user.js) in Tampermonkey
-2. Go to [auriga.epita.fr](https://auriga.epita.fr) and navigate to your grades
-3. Click **Download** in the purple panel (bottom-right)
-4. Move the file to `tools/auriga-capture.json`
-
-See [`tools/README.md`](tools/README.md) for details.
+The dev server replays real Auriga API responses. You need to capture them once — see the [capture tool guide](tools/README.md).
 
 ### Run
 
