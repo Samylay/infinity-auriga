@@ -2,11 +2,13 @@
 
 Auriga treats all exams as equally weighted. This directory contains the **real** coefficients, contributed by the community.
 
+The student average is a **flat weighted average** of all marks: `Σ(mark × coef) / Σ(coef)`. Subject and module weights are derived from the sum of their children's coefficients automatically.
+
 ## How to add coefficients for your semester
 
 ### 1. Find your codes
 
-**Hover** any module name, subject name, or mark name in Infinity Auriga — a tooltip shows its full code. **Click** to copy it to your clipboard.
+**Hover** any mark name in Infinity Auriga — a tooltip shows its full code. **Click** to copy it to your clipboard.
 
 Every copyable name has a <u>dashed underline</u> to indicate it's clickable.
 
@@ -39,36 +41,16 @@ Filename: `s{semester}_{year}_{track}.js` (all lowercase)
 
 ### 3. Fill in your coefficients
 
-You can override coefficients at **three levels** independently — module, subject, or individual mark. Use the appropriate code prefix:
-
-```
-Full code:   2526_I_INF_FISA_S07_CS_GR_WS_EX
-                                 │   │  │  └─── mark level (full code)
-                                 │   │  └────── subject level (trim exam + eval type)
-                                 │   └───────── module level (first segment after semester)
-```
-
-Copy this template:
+Use the full exam code for each mark. Only list entries whose coefficient is NOT 1:
 
 ```js
 /**
  * Coefficients — S?? TRACK YEAR
- *
  * Only list entries whose coefficient is NOT 1.
- * Override at any level:
- *   - Module:  'XXXX_I_INF_TRACK_SXX_MODULE'
- *   - Subject: 'XXXX_I_INF_TRACK_SXX_MODULE_SUBJECT'
- *   - Mark:    'XXXX_I_INF_TRACK_SXX_MODULE_SUBJECT_EXAM_TYPE'
  */
 export default {
-    // --- Module-level (weights the whole module in the student average) ---
-    'XXXX_I_INF_TRACK_SXX_AEE': 8,
-
-    // --- Subject-level (weights the subject in the module average) ---
-    // 'XXXX_I_INF_TRACK_SXX_CS_GR': 2,
-
-    // --- Mark-level (weights the mark in the subject average) ---
-    'XXXX_I_INF_TRACK_SXX_CS_GR_WS_EX': 2,
+    'XXXX_I_INF_TRACK_SXX_AEE_EAE3_EX': 8,          // Alternance
+    'XXXX_I_INF_TRACK_SXX_CS_GR_WS_EX': 2,           // Windows sécurité
 };
 ```
 
