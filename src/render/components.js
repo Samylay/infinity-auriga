@@ -164,7 +164,7 @@ export function renderFooter() {
             resetLink
         ),
         h('p', { class: 'subtext' },
-            h('span', {}, `${app.name} \u00a9 2019-2026`),
+            h('span', {}, `${app.name} v${app.version} \u00a9 ${new Date().getFullYear()} KazeTachinuu`),
             h('br'),
             h('span', {}, 'Licensed under '),
             h('a', { class: 'link colored', href: `${app.repository}/blob/master/LICENSE`, target: '_blank' }, 'MIT License')

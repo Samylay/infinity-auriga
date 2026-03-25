@@ -1095,7 +1095,7 @@
 		}, "Coefficients"), "\xA0·\xA0", h("a", {
 			href: app.repository,
 			target: "_blank"
-		}, "Sources"), "\xA0·\xA0", resetLink), h("p", { class: "subtext" }, h("span", {}, `${app.name} \u00a9 2019-2026`), h("br"), h("span", {}, "Licensed under "), h("a", {
+		}, "Sources"), "\xA0·\xA0", resetLink), h("p", { class: "subtext" }, h("span", {}, `${app.name} v${app.version} \u00a9 ${(/* @__PURE__ */ new Date()).getFullYear()} KazeTachinuu`), h("br"), h("span", {}, "Licensed under "), h("a", {
 			class: "link colored",
 			href: `${app.repository}/blob/master/LICENSE`,
 			target: "_blank"
