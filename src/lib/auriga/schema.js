@@ -14,7 +14,12 @@
  * SYNTHESIS endpoint (APP_040_010_MES_NOTES_SYNT, e.g. menuEntry 1144):
  *   [0] personId     [1] avgPreRatt     [2] examCode      [3] caption {fr,en}  [4] avgFinal
  *
- * Last verified: 2026-03-24 against capture auriga-capture-1774299604740.json
+ * PEDAGOGICAL REGISTRATION endpoint (APP_000_014_INSC_PEDA, e.g. menuEntry 1034):
+ *   [0] internalId   [1] examCode       [2] obligationType {en,fr}   [3] registrationStatus {en,fr}
+ *   Component types (en): "Semester", "EU Resource", "EU Authentic Assessment Situation",
+ *                         "Educational unit (ECUE)"
+ *
+ * Last verified: 2026-03-26 against capture auriga-capture-1774299604740.json
  */
 
 // --- Menu entry codes (how Auriga identifies its grade views) -------------------
@@ -22,12 +27,14 @@
 export const MENU_CODES = {
     grades:    'APP_040_010_MES_NOTES',
     synthesis: 'APP_040_010_MES_NOTES_SYNT',
+    pedagogical: 'APP_000_014_INSC_PEDA',
 };
 
 // --- Column indices -------------------------------------------------------------
 
 const GRADES = { internalId: 0, mark: 1, coefficient: 2, examCode: 3, examType: 4 };
 const SYNTHESIS = { personId: 0, avgPreRatt: 1, examCode: 2, caption: 3, avgFinal: 4 };
+const PEDAGOGICAL = { internalId: 0, examCode: 1, obligationType: 2, registrationStatus: 3 };
 
 // --- Validation -----------------------------------------------------------------
 
@@ -97,5 +104,23 @@ export function parseSynthesisLine(line) {
         name: caption.fr || caption.en || examCode,
         avgPreRatt: line[SYNTHESIS.avgPreRatt],
         avgFinal: line[SYNTHESIS.avgFinal],
+    };
+}
+
+/**
+ * Parse a pedagogical registration line into a named object.
+ * Returns the component type (en) which tells us the hierarchy level.
+ *
+ * @param {Array} line - Raw array from Auriga searchResult
+ * @returns {{ examCode: string, componentType: string } | null}
+ */
+export function parsePedagogicalLine(line) {
+    const examCode = line[PEDAGOGICAL.examCode];
+    if (!examCode || typeof examCode !== 'string') return null;
+
+    const typeCaption = line[PEDAGOGICAL.obligationType] || {};
+    return {
+        examCode,
+        componentType: typeCaption.en || typeCaption.fr || '',
     };
 }

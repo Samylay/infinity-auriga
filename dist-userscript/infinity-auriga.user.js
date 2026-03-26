@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Infinity Auriga
 // @namespace    infinity-auriga
-// @version      1.5.0
+// @version      1.6.0
 // @description  Make Auriga Great Again - enhanced grades UI for EPITA
 // @author       KazeTachinuu & contributors
 // @match        https://auriga.epita.fr/*
@@ -13,7 +13,7 @@
 // @downloadURL  https://raw.githubusercontent.com/KazeTachinuu/infinity-auriga/master/dist-userscript/infinity-auriga.user.js
 // ==/UserScript==
 
-;(function(){if(localStorage.getItem('infinity_auriga_enabled')==='0')return;var s=document.createElement('style');s.setAttribute('data-infinity','1');s.textContent="*,*:before,*:after{box-sizing:border-box}body{margin:0;overflow:hidden}div{display:flex}div,hr{box-sizing:border-box}button{outline:none;border:none;background:none}a{color:inherit;text-decoration:inherit}:root{--bg-dark: #343D55;--bg-darker: #151925;--text-primary: #151925;--text-muted: #868DA0;--text-meta: #909090;--surface: #FFFFFF;--surface-alt: #F3F4F5;--dot-color: #D5D9DC;--accent: #3D69ED;--radius: 6px;--content-px: clamp(25px, 5vw, 75px);--font-header: clamp(20px, 3vw, 32px);--font-body: clamp(13px, 1.5vw, 18px);-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif}#app{height:100dvh}button,a,.clickable{cursor:pointer;user-select:none;transition:opacity .15s}button:not(.opaque):hover,a:not(.opaque):hover,.clickable:not(.opaque):hover{opacity:.8}button:not(.opaque):active,a:not(.opaque):active,.clickable:not(.opaque):active{opacity:.6}.subtext{color:var(--text-muted);font-size:clamp(13px,1.5vw,16px);line-height:22px;text-align:center}.link.colored{color:var(--accent)}.card{border-radius:var(--radius);box-shadow:#00000026 0 2px 8px;transition:all .2s}.card.clickable:hover{box-shadow:#00000040 0 2px 9px;transform:translateY(-1px)}.variable{transition:width .6s cubic-bezier(.65,0,.35,1),margin .6s cubic-bezier(.65,0,.35,1)}.class-average{color:var(--text-meta)}.point{flex-shrink:0;width:8px;height:8px;background-color:var(--dot-color);border-radius:50%}.point.big{width:10px;height:10px}.point.small{width:6px;height:6px}#background{position:relative;z-index:1;flex-grow:1;overflow:hidden;background:linear-gradient(-212deg,var(--bg-dark) 0%,var(--bg-darker) 95%)}.triangle{position:absolute}#top-triangle{top:-175px;left:-175px;width:500px;filter:drop-shadow(3px 3px 15px rgba(0,0,0,.25))}#bottom-triangle{bottom:-75px;right:-100px;width:600px;filter:drop-shadow(-3px -3px 15px rgba(0,0,0,.25))}#content{flex-direction:column;justify-content:space-between;align-items:center;z-index:2;width:575px;padding:35px 0;overflow-y:auto;background-color:var(--surface)}#content.wide{width:1200px}#content.wide #header #logo{width:300px;margin:0}#header{width:100%;padding:20px var(--content-px);justify-content:space-between;align-items:center;flex-shrink:0;overflow:hidden}#header #logo{flex-shrink:0;width:400px;margin-top:25px;margin-left:12.5px}#header #logo svg{width:100%;height:auto}#header #logout{color:#251515;font-size:clamp(16px,2vw,22px);font-weight:500}#footer{flex-direction:column;flex-shrink:0}#footer #links{justify-content:center;margin-bottom:8px;font-weight:500;font-size:clamp(16px,2vw,22px);color:var(--text-primary)}#main{flex-direction:column;flex-grow:1;justify-content:center;width:100%}.loading{flex-direction:column;align-items:center;padding:0 var(--content-px)}.loading-step{margin-top:clamp(20px,4vw,40px);font-size:clamp(16px,2vw,20px);font-weight:600;color:var(--text-primary);text-align:center}.loading-request{margin-top:6px;min-height:1.4em;max-width:100%;font-size:clamp(11px,1.2vw,13px);font-family:SF Mono,Cascadia Code,Fira Code,monospace;color:var(--text-muted);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:0;transition:opacity .15s}.loading-request:not(:empty){opacity:1}.loading-quote{margin-top:clamp(25px,4vw,40px);font-size:clamp(13px,1.4vw,15px);font-style:italic;color:var(--text-muted);text-align:center;opacity:.6}.spinner{width:clamp(60px,8vw,85px);animation:spin .75s linear infinite}.spinner svg{width:100%;height:100%}@keyframes spin{to{transform:rotate(360deg)}}.content{flex-direction:column;flex-grow:1;align-items:flex-start;padding:5px var(--content-px);margin-bottom:25px;overflow-y:auto}.header{flex-direction:column;position:relative;font-weight:700;font-size:var(--font-header)}.header hr{width:100%;border-bottom:0;border-color:var(--surface);position:relative;z-index:-1}.filters{justify-content:space-between;width:100%;margin-bottom:clamp(30px,4vw,50px)}.combo-box{flex-direction:column;position:relative}.combo-box .name{height:20px;margin-bottom:clamp(5px,1vw,8px);margin-left:1px;color:#343434;font-size:clamp(14px,1.5vw,16px)}.combo-box .box{justify-content:space-between;align-items:center;min-width:clamp(200px,30vw,400px);height:clamp(32px,4vw,40px);padding:0 12px;border-radius:var(--radius);background-color:var(--surface-alt);font-size:clamp(12px,1.5vw,16px)}.combo-box .box svg{height:clamp(8px,1vw,10px);margin-top:2px;transition:transform .125s}.combo-box .box.opened svg{transform:rotate(180deg)}.combo-box .choices{flex-direction:column;position:absolute;top:75px;z-index:2;width:100%;background-color:var(--surface);border-radius:var(--radius);font-size:clamp(12px,1.5vw,16px)}.combo-box .choices .choice{padding:8px 12px;transition:background-color .15s}.combo-box .choices .choice:hover{background-color:#0000000d}.combo-box .choices .choice:active{background-color:#0000001a}.combo-box .choices .choice:first-child{border-top-left-radius:var(--radius);border-top-right-radius:var(--radius)}.combo-box .choices .choice:last-child{border-bottom-left-radius:var(--radius);border-bottom-right-radius:var(--radius)}.no-updates{margin-bottom:20px;font-size:var(--font-body)}.updates{flex-direction:column;width:100%;margin-bottom:15px}.updates .update{align-items:center;margin-bottom:10px;padding-left:35px;font-size:clamp(18px,2.5vw,28px)}.updates .update .top{align-items:center}.updates .update .top .id{margin-left:15px;margin-right:10px;font-weight:700}.updates .update .top .dash{margin-right:10px;font-size:clamp(18px,2vw,24px)}.updates .update .top .name{font-size:var(--font-body);margin-right:10px}.updates .update .top .name .target{font-weight:500}.updates .update .mark{align-items:center;margin-bottom:1px;font-weight:500}.updates .update .mark .point{margin-left:2px;margin-right:12px}.updates .update .mark .from{color:#a5a9b5;text-decoration:line-through}.updates .update .mark .update-arrow{margin:0 10px}.updates .update .mark .type-sign{margin-left:12px;margin-bottom:2px}.updates .update .mark .type-sign svg{width:30px}.big-list{flex-direction:column;margin-bottom:20px;padding-top:5px;transition:opacity .15s}.big-list .entry{align-items:center;margin-bottom:12px;padding-left:clamp(15px,3vw,35px);font-size:clamp(18px,2.8vw,26px)}.big-list .entry .name{margin-left:12px;margin-right:10px}.big-list .entry .mark{margin-left:10px}.big-list .entry .mark .value{font-weight:700}.coeff-info{flex-direction:column;margin-top:8px;padding-left:clamp(15px,3vw,35px);font-size:clamp(14px,1.8vw,18px)}.coeff-main{align-items:center;gap:12px;font-weight:500}.coeff-muted{color:var(--text-muted);font-weight:400}.coeff-links{margin-top:5px;margin-left:20px;font-size:clamp(12px,1.4vw,15px);font-weight:500}hr.separator{width:100%;margin-top:25px;opacity:.3;border-bottom:0;border-color:var(--surface)}.header.module{max-width:100%;margin-top:50px}.header.module .text{align-items:center}.header.module .name,.header.module .average,.header.module .class-average,.header.module .max{white-space:nowrap}.header.module .name{display:inline-block;overflow:hidden;text-overflow:ellipsis;padding-bottom:2px}.header.module .point{margin:2px 10px 0}.header.module .class-average{margin-left:10px;font-weight:400}.subject{width:100%;margin:15px 0}.subject .info{flex-direction:column;align-items:center;flex-shrink:0;width:250px;padding-top:15px;padding-bottom:17px}.subject .info .top,.subject .info .bottom{display:contents}.subject .info .id{font-weight:700;font-size:24px;word-break:break-word}.subject .info .point{display:none}.subject .info .average{margin-top:10px;font-size:24px}.subject .info .average .value{font-weight:700}.subject .info .class-average{font-size:14px}.subject .info .bottom-line{display:none}.subject .marks{flex-direction:column;flex-grow:1;justify-content:center;max-width:calc(100% - 275px);padding:15px 0;font-size:16px}.subject .marks .marks-title{font-weight:600;font-size:15px;margin-bottom:6px;color:#444}.subject .marks .mark{align-items:center;max-width:100%;margin:3px 0}.subject .marks .mark .point{margin-bottom:1px}.subject .marks .mark .line{display:contents}.subject .marks .mark .name,.subject .marks .mark .value,.subject .marks .mark .class-average{white-space:nowrap}.subject .marks .mark .name{display:inline-block;margin-left:15px;overflow:hidden;text-overflow:ellipsis;padding-bottom:2px}.subject .marks .mark .value{justify-content:flex-end;margin-left:1px;font-weight:700}.subject .marks .mark .class-average{margin-left:10px}.coeff-override{margin-left:6px;color:var(--accent);font-weight:600;font-size:.85em}.copy-code{display:inline-block;border-bottom:1px dashed var(--dot-color)}.copy-code:hover{border-bottom-color:var(--text-muted)}.code-tooltip{position:fixed;z-index:9999;padding:5px 12px;border-radius:5px;background:var(--bg-darker);color:#e8eaed;font-size:13px;font-weight:500;letter-spacing:.3px;font-family:SF Mono,Cascadia Code,Fira Code,monospace;white-space:nowrap;pointer-events:none;box-shadow:0 4px 12px #0000004d;opacity:0;transition:opacity .12s}.code-tooltip.copied{background:var(--accent);color:#fff;font-family:inherit}.no-marks{flex-grow:1;justify-content:center;align-items:center;width:100%;font-size:28px}@media (max-width: 850px){.filters{flex-direction:column;gap:15px}.header hr{margin-top:9px}.updates{margin-top:4px;margin-bottom:12px}.updates .update{display:grid;grid-template-columns:17px 100%;margin-bottom:6px;padding-left:15px}.updates .update>.point{width:6px;height:6px}.updates .update .top .id{margin-left:0;margin-right:6px}.updates .update .top .name{display:inline-block;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}.updates .update .top .name .target{display:none}.updates .update .mark{grid-column:2 / 3;height:23px}.updates .update .mark .point{display:none}.updates .update .mark .update-arrow{width:20px;margin:0 6px 1px}.updates .update .mark .type-sign{width:14px;margin-left:6px;margin-bottom:2px}.header.module{margin-top:20px;margin-bottom:6px}.header.module .text{flex-direction:column;align-items:flex-start;margin-left:-1px}.header.module .text .name{max-width:100%;margin-bottom:2px;font-size:20px}.header.module .text .point{display:none}.header.module .text .bottom{align-items:center;font-size:16px}.header.module .text .bottom .class-average{margin-left:5px;font-size:14px}.header.module .bottom-line{margin-top:7px;margin-bottom:1px;opacity:.6}.subject{flex-direction:column;margin:10px 0;padding:10px 14px}.subject .no-marks{margin:4px 0;font-size:14px}.subject .info{align-items:flex-start;width:100%;padding:0}.subject .info .top,.subject .info .bottom{display:flex;align-items:center;max-width:100%}.subject .info .id{font-size:18px}.subject .info .point{display:block;width:5px;height:5px;margin:0 8px}.subject .info .average{margin:0;font-size:14px}.subject .info .class-average{margin-left:5px;font-size:12px}.subject .info .bottom-line{display:block;width:100%;border-bottom:0;border-color:var(--surface);opacity:.3}.subject .marks{max-width:100%;padding:0}.subject .marks .mark{display:grid;grid-template-columns:12px calc(100% - 5px);padding:0 5px}.subject .marks .mark .point{width:5px;height:5px;margin-top:1px}.subject .marks .mark .line{display:flex;flex-direction:row-reverse;justify-content:flex-end;font-size:13px}.subject .marks .mark .line .name{margin-left:0}.subject .marks .mark .line .value{width:auto;margin-left:0}.subject .marks .mark .class-average{grid-column:2 / 3;margin-left:0;font-size:11px}.subject .marks .mark .class-average .parenthesis{display:none}}@media (max-width: 575px){#header{flex-direction:column;padding:0;justify-content:center;margin-bottom:20px}#header #logo{margin-top:15px;margin-left:0;max-width:80%}#content{padding:15px 0}hr.separator{margin-top:0;margin-bottom:5px}}@media (max-height: 650px){#header #logo{margin-top:0}#header #logo svg{height:115px}}@media (max-height: 550px){#header{margin-bottom:10px}#header #logo svg{height:100px}#header #logout{font-size:16px}}::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--dot-color);border-radius:3px}\n";(document.head||document.documentElement).appendChild(s)})();
+;(function(){if(localStorage.getItem('infinity_auriga_enabled')==='0')return;var s=document.createElement('style');s.setAttribute('data-infinity','1');s.textContent="*,*:before,*:after{box-sizing:border-box}body{margin:0;overflow:hidden}div{display:flex}div,hr{box-sizing:border-box}button{outline:none;border:none;background:none}a{color:inherit;text-decoration:inherit}:root{--bg-dark: #343D55;--bg-darker: #151925;--text-primary: #151925;--text-muted: #868DA0;--text-meta: #909090;--surface: #FFFFFF;--surface-alt: #F3F4F5;--dot-color: #D5D9DC;--accent: #3D69ED;--radius: 6px;--content-px: clamp(25px, 5vw, 75px);--font-header: clamp(20px, 3vw, 32px);--font-body: clamp(13px, 1.5vw, 18px);-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif}#app{height:100dvh}button,a,.clickable{cursor:pointer;user-select:none;transition:opacity .15s}button:not(.opaque):hover,a:not(.opaque):hover,.clickable:not(.opaque):hover{opacity:.8}button:not(.opaque):active,a:not(.opaque):active,.clickable:not(.opaque):active{opacity:.6}.subtext{color:var(--text-muted);font-size:clamp(13px,1.5vw,16px);line-height:22px;text-align:center}.link.colored{color:var(--accent)}.card{border-radius:var(--radius);box-shadow:#00000026 0 2px 8px;transition:all .2s}.card.clickable:hover{box-shadow:#00000040 0 2px 9px;transform:translateY(-1px)}.variable{transition:width .6s cubic-bezier(.65,0,.35,1),margin .6s cubic-bezier(.65,0,.35,1)}.class-average{color:var(--text-meta)}.point{flex-shrink:0;width:8px;height:8px;background-color:var(--dot-color);border-radius:50%}.point.big{width:10px;height:10px}.point.small{width:6px;height:6px}#background{position:relative;z-index:1;flex-grow:1;overflow:hidden;background:linear-gradient(-212deg,var(--bg-dark) 0%,var(--bg-darker) 95%)}.triangle{position:absolute}#top-triangle{top:-175px;left:-175px;width:500px;filter:drop-shadow(3px 3px 15px rgba(0,0,0,.25))}#bottom-triangle{bottom:-75px;right:-100px;width:600px;filter:drop-shadow(-3px -3px 15px rgba(0,0,0,.25))}#content{flex-direction:column;justify-content:space-between;align-items:center;z-index:2;width:575px;padding:35px 0;overflow-y:auto;background-color:var(--surface)}#content.wide{width:1200px}#content.wide #header #logo{width:300px;margin:0}#header{width:100%;padding:20px var(--content-px);justify-content:space-between;align-items:center;flex-shrink:0;overflow:hidden}#header #logo{flex-shrink:0;width:400px;margin-top:25px;margin-left:12.5px}#header #logo svg{width:100%;height:auto}#header #logout{color:#251515;font-size:clamp(16px,2vw,22px);font-weight:500}#footer{flex-direction:column;flex-shrink:0}#footer #links{justify-content:center;margin-bottom:8px;font-weight:500;font-size:clamp(16px,2vw,22px);color:var(--text-primary)}#main{flex-direction:column;flex-grow:1;justify-content:center;width:100%}.loading{flex-direction:column;align-items:center;padding:0 var(--content-px)}.loading-step{margin-top:clamp(20px,4vw,40px);font-size:clamp(16px,2vw,20px);font-weight:600;color:var(--text-primary);text-align:center}.loading-request{margin-top:6px;min-height:1.4em;max-width:100%;font-size:clamp(11px,1.2vw,13px);font-family:SF Mono,Cascadia Code,Fira Code,monospace;color:var(--text-muted);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:0;transition:opacity .15s}.loading-request:not(:empty){opacity:1}.loading-quote{margin-top:clamp(25px,4vw,40px);font-size:clamp(13px,1.4vw,15px);font-style:italic;color:var(--text-muted);text-align:center;opacity:.6}.spinner{width:clamp(60px,8vw,85px);animation:spin .75s linear infinite}.spinner svg{width:100%;height:100%}@keyframes spin{to{transform:rotate(360deg)}}.content{flex-direction:column;flex-grow:1;align-items:flex-start;padding:5px var(--content-px);margin-bottom:25px;overflow-y:auto}.header{flex-direction:column;position:relative;font-weight:700;font-size:var(--font-header)}.header hr{width:100%;border-bottom:0;border-color:var(--surface);position:relative;z-index:-1}.filters{justify-content:space-between;width:100%;margin-bottom:clamp(30px,4vw,50px)}.combo-box{flex-direction:column;position:relative}.combo-box .name{height:20px;margin-bottom:clamp(5px,1vw,8px);margin-left:1px;color:#343434;font-size:clamp(14px,1.5vw,16px)}.combo-box .box{justify-content:space-between;align-items:center;min-width:clamp(200px,30vw,400px);height:clamp(32px,4vw,40px);padding:0 12px;border-radius:var(--radius);background-color:var(--surface-alt);font-size:clamp(12px,1.5vw,16px)}.combo-box .box svg{height:clamp(8px,1vw,10px);margin-top:2px;transition:transform .125s}.combo-box .box.opened svg{transform:rotate(180deg)}.combo-box .choices{flex-direction:column;position:absolute;top:75px;z-index:2;width:100%;background-color:var(--surface);border-radius:var(--radius);font-size:clamp(12px,1.5vw,16px)}.combo-box .choices .choice{padding:8px 12px;transition:background-color .15s}.combo-box .choices .choice:hover{background-color:#0000000d}.combo-box .choices .choice:active{background-color:#0000001a}.combo-box .choices .choice:first-child{border-top-left-radius:var(--radius);border-top-right-radius:var(--radius)}.combo-box .choices .choice:last-child{border-bottom-left-radius:var(--radius);border-bottom-right-radius:var(--radius)}.no-updates{margin-bottom:20px;font-size:var(--font-body)}.updates{flex-direction:column;width:100%;margin-bottom:15px}.updates .update{align-items:center;margin-bottom:10px;padding-left:35px;font-size:clamp(18px,2.5vw,28px)}.updates .update .top{align-items:center}.updates .update .top .id{margin-left:15px;margin-right:10px;font-weight:700}.updates .update .top .dash{margin-right:10px;font-size:clamp(18px,2vw,24px)}.updates .update .top .name{font-size:var(--font-body);margin-right:10px}.updates .update .top .name .target{font-weight:500}.updates .update .mark{align-items:center;margin-bottom:1px;font-weight:500}.updates .update .mark .point{margin-left:2px;margin-right:12px}.updates .update .mark .from{color:#a5a9b5;text-decoration:line-through}.updates .update .mark .update-arrow{margin:0 10px}.updates .update .mark .type-sign{margin-left:12px;margin-bottom:2px}.updates .update .mark .type-sign svg{width:30px}.big-list{flex-direction:column;margin-bottom:20px;padding-top:5px;transition:opacity .15s}.big-list .entry{align-items:center;margin-bottom:12px;padding-left:clamp(15px,3vw,35px);font-size:clamp(18px,2.8vw,26px)}.big-list .entry .name{margin-left:12px;margin-right:10px}.big-list .entry .mark{margin-left:10px}.big-list .entry .mark .value{font-weight:700}.coeff-info{flex-direction:column;margin-top:8px;padding-left:clamp(15px,3vw,35px);font-size:clamp(14px,1.8vw,18px)}.coeff-main{align-items:center;gap:12px;font-weight:500}.coeff-muted{color:var(--text-muted);font-weight:400}.coeff-links{margin-top:5px;margin-left:20px;font-size:clamp(12px,1.4vw,15px);font-weight:500}.coeff-copied{color:#44b732!important}.api-banner{width:100%;padding:10px 14px;margin-bottom:20px;background:#fff3e0;border:1px solid #ffe0b2;border-radius:var(--radius);align-items:center;justify-content:space-between;gap:12px;font-size:clamp(12px,1.4vw,14px);color:#6d4c00}.api-banner-title{font-weight:600}.api-banner-actions{align-items:center;gap:10px;flex-shrink:0}.api-banner-btn{padding:4px 12px;border-radius:4px;background:#ff9800;color:#fff;font-weight:600;font-size:12px;white-space:nowrap}.api-banner-btn:hover{opacity:.85}.api-banner-dismiss{color:#6d4c00;font-size:16px;line-height:1}hr.separator{width:100%;margin-top:25px;opacity:.3;border-bottom:0;border-color:var(--surface)}.header.module{max-width:100%;margin-top:50px}.header.module .text{align-items:center}.header.module .name,.header.module .average,.header.module .class-average,.header.module .max{white-space:nowrap}.header.module .name{display:inline-block;overflow:hidden;text-overflow:ellipsis;padding-bottom:2px}.header.module .point{margin:2px 10px 0}.header.module .class-average{margin-left:10px;font-weight:400}.subject{width:100%;margin:15px 0}.subject .info{flex-direction:column;align-items:center;flex-shrink:0;width:250px;padding-top:15px;padding-bottom:17px}.subject .info .top,.subject .info .bottom{display:contents}.subject .info .id{font-weight:700;font-size:24px;word-break:break-word}.subject .info .point{display:none}.subject .info .average{margin-top:10px;font-size:24px}.subject .info .average .value{font-weight:700}.subject .info .class-average{font-size:14px}.subject .info .bottom-line{display:none}.subject .marks{flex-direction:column;flex-grow:1;justify-content:center;max-width:calc(100% - 275px);padding:15px 0;font-size:16px}.subject .marks .marks-title{font-weight:600;font-size:15px;margin-bottom:6px;color:#444}.subject .marks .mark{align-items:center;max-width:100%;margin:3px 0}.subject .marks .mark .point{margin-bottom:1px}.subject .marks .mark .line{display:contents}.subject .marks .mark .name,.subject .marks .mark .value,.subject .marks .mark .class-average{white-space:nowrap}.subject .marks .mark .name{display:inline-block;margin-left:15px;overflow:hidden;text-overflow:ellipsis;padding-bottom:2px}.subject .marks .mark .value{justify-content:flex-end;margin-left:1px;font-weight:700}.subject .marks .mark .class-average{margin-left:10px}.coeff-override{margin-left:6px;color:var(--accent);font-weight:600;font-size:.85em}.copy-code{display:inline-block;border-bottom:1px dashed var(--dot-color)}.copy-code:hover{border-bottom-color:var(--text-muted)}.code-tooltip{position:fixed;z-index:9999;padding:5px 12px;border-radius:5px;background:var(--bg-darker);color:#e8eaed;font-size:13px;font-weight:500;letter-spacing:.3px;font-family:SF Mono,Cascadia Code,Fira Code,monospace;white-space:nowrap;pointer-events:none;box-shadow:0 4px 12px #0000004d;opacity:0;transition:opacity .12s}.code-tooltip.copied{background:var(--accent);color:#fff;font-family:inherit}.no-marks{flex-grow:1;justify-content:center;align-items:center;width:100%;font-size:28px}@media (max-width: 850px){.filters{flex-direction:column;gap:15px}.header hr{margin-top:9px}.updates{margin-top:4px;margin-bottom:12px}.updates .update{display:grid;grid-template-columns:17px 100%;margin-bottom:6px;padding-left:15px}.updates .update>.point{width:6px;height:6px}.updates .update .top .id{margin-left:0;margin-right:6px}.updates .update .top .name{display:inline-block;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}.updates .update .top .name .target{display:none}.updates .update .mark{grid-column:2 / 3;height:23px}.updates .update .mark .point{display:none}.updates .update .mark .update-arrow{width:20px;margin:0 6px 1px}.updates .update .mark .type-sign{width:14px;margin-left:6px;margin-bottom:2px}.header.module{margin-top:20px;margin-bottom:6px}.header.module .text{flex-direction:column;align-items:flex-start;margin-left:-1px}.header.module .text .name{max-width:100%;margin-bottom:2px;font-size:20px}.header.module .text .point{display:none}.header.module .text .bottom{align-items:center;font-size:16px}.header.module .text .bottom .class-average{margin-left:5px;font-size:14px}.header.module .bottom-line{margin-top:7px;margin-bottom:1px;opacity:.6}.subject{flex-direction:column;margin:10px 0;padding:10px 14px}.subject .no-marks{margin:4px 0;font-size:14px}.subject .info{align-items:flex-start;width:100%;padding:0}.subject .info .top,.subject .info .bottom{display:flex;align-items:center;max-width:100%}.subject .info .id{font-size:18px}.subject .info .point{display:block;width:5px;height:5px;margin:0 8px}.subject .info .average{margin:0;font-size:14px}.subject .info .class-average{margin-left:5px;font-size:12px}.subject .info .bottom-line{display:block;width:100%;border-bottom:0;border-color:var(--surface);opacity:.3}.subject .marks{max-width:100%;padding:0}.subject .marks .mark{display:grid;grid-template-columns:12px calc(100% - 5px);padding:0 5px}.subject .marks .mark .point{width:5px;height:5px;margin-top:1px}.subject .marks .mark .line{display:flex;flex-direction:row-reverse;justify-content:flex-end;font-size:13px}.subject .marks .mark .line .name{margin-left:0}.subject .marks .mark .line .value{width:auto;margin-left:0}.subject .marks .mark .class-average{grid-column:2 / 3;margin-left:0;font-size:11px}.subject .marks .mark .class-average .parenthesis{display:none}}@media (max-width: 575px){#header{flex-direction:column;padding:0;justify-content:center;margin-bottom:20px}#header #logo{margin-top:15px;margin-left:0;max-width:80%}#content{padding:15px 0}hr.separator{margin-top:0;margin-bottom:5px}}@media (max-height: 650px){#header #logo{margin-top:0}#header #logo svg{height:115px}}@media (max-height: 550px){#header{margin-bottom:10px}#header #logo svg{height:100px}#header #logout{font-size:16px}}::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--dot-color);border-radius:3px}\n";(document.head||document.documentElement).appendChild(s)})();
 (function() {
 	//#region \0rolldown/runtime.js
 	var __create = Object.create;
@@ -689,6 +689,58 @@
 		};
 	}
 	/**
+	* Generate a pre-filled coefficient template from the current grade tree.
+	* All marks are listed with coefficient 1, organized by module/subject with
+	* human-readable comments — ready for a contributor to fill in real values.
+	*
+	* @param {Module[]} marks - grade tree
+	* @param {string} semesterKey - e.g. "S07_2526"
+	* @param {string} track - e.g. "FISA"
+	* @param {Map|null} [overrides] - existing coefficient overrides to pre-fill
+	* @returns {{ filename: string, content: string }}
+	*/
+	function generateTemplate(marks, semesterKey, track, overrides = null) {
+		const [semester, year] = semesterKey.split("_");
+		const filename = `${semesterKey}_${track}`.toLowerCase() + ".js";
+		const yearLabel = `20${year.slice(0, 2)}/20${year.slice(2)}`;
+		const entries = [];
+		for (const mod of marks) {
+			const modEntries = [];
+			for (const sub of mod.subjects) for (const mark of sub.marks) modEntries.push({
+				code: mark._code,
+				name: mark.name
+			});
+			if (modEntries.length > 0) entries.push({
+				module: mod.name,
+				marks: modEntries
+			});
+		}
+		const maxLen = Math.max(...entries.flatMap((e) => e.marks.map((m) => m.code.length)));
+		const lines = [
+			`/**`,
+			` * Coefficients — ${semester} ${track} ${yearLabel}`,
+			` * Filename: ${filename}`,
+			` * Only list entries whose coefficient is NOT 1.`,
+			` */`,
+			`export default {`
+		];
+		for (let i = 0; i < entries.length; i++) {
+			const { module: modName, marks: modMarks } = entries[i];
+			lines.push(`    // ── ${modName} ${"─".repeat(Math.max(1, 50 - modName.length))}`);
+			for (const { code, name } of modMarks) {
+				const coef = overrides?.get(code) ?? 1;
+				const pad = " ".repeat(Math.max(1, maxLen - code.length));
+				lines.push(`    '${code}': ${coef},${pad} // ${name}`);
+			}
+			if (i < entries.length - 1) lines.push("");
+		}
+		lines.push(`};`, "");
+		return {
+			filename,
+			content: lines.join("\n")
+		};
+	}
+	/**
 	* Apply coefficient overrides and compute all averages.
 	*
 	* @param {Module[]} marks - grade tree (mutated in place)
@@ -777,6 +829,7 @@
 		const { average } = applyCoefficients(marks, coeffData?.overrides ?? null);
 		status?.step("Calcul des changements...");
 		const updates = getUpdates(filtersValues, marks);
+		const coeffTemplate = track ? generateTemplate(marks, filtersValues.semester, track, coeffData?.overrides ?? null) : null;
 		return {
 			marks,
 			averages: {
@@ -784,7 +837,36 @@
 				promo: result.classAverage
 			},
 			updates,
-			coeffSource: coeffData?.file ?? null
+			coeffSource: coeffData?.file ?? null,
+			coeffTemplate
+		};
+	}
+	/**
+	* Try to load marks from localStorage cache (saved by the updates system).
+	* Returns a render-ready data object, or null if no cache exists.
+	*/
+	function loadCachedMarks(filtersValues) {
+		const save = JSON.parse(localStorage.getItem("auriga_marks_save") || "{}");
+		const key = JSON.stringify(filtersValues);
+		const marks = save[key];
+		if (!marks || marks.length === 0) return null;
+		let totalSum = 0;
+		let totalWeight = 0;
+		for (const mod of marks) for (const sub of mod.subjects) for (const mark of sub.marks) if (mark.value != null && mark.value !== .01) {
+			const coef = mark._rawCoefficient ?? mark.coefficient;
+			totalSum += mark.value * coef;
+			totalWeight += coef;
+		}
+		const updates = JSON.parse(localStorage.getItem("auriga_updates") || "{}");
+		return {
+			marks,
+			averages: {
+				student: totalWeight > 0 ? totalSum / totalWeight : null,
+				promo: null
+			},
+			updates: updates[key] || [],
+			coeffSource: null,
+			coeffTemplate: null
 		};
 	}
 	/**
@@ -799,7 +881,7 @@
 	//#region package.json
 	var version;
 	var init_package = __esmMin((() => {
-		version = "1.5.0";
+		version = "1.6.0";
 	}));
 	//#endregion
 	//#region src/app.js
@@ -1108,7 +1190,45 @@
 	}));
 	//#endregion
 	//#region src/render/app.js
-	function renderApp(container, { name, marks, averages, filters, filtersValues, updates, coeffSource, onSemesterChange }) {
+	/**
+	* Build a dismissable warning banner shown when the API failed but cached data is available.
+	*/
+	function createApiBanner(error, onRetry, filtersValues) {
+		const banner = h("div", { class: "api-banner" }, h("div", { class: "api-banner-text" }, h("span", { class: "api-banner-title" }, "Hors-ligne"), h("span", { class: "api-banner-detail" }, " — impossible de contacter Auriga. Vos notes peuvent être obsolètes.")), h("div", { class: "api-banner-actions" }, h("a", {
+			href: "#",
+			class: "api-banner-btn",
+			onclick: (e) => {
+				e.preventDefault();
+				onRetry(filtersValues.semester);
+			}
+		}, "Réessayer"), h("a", {
+			href: "#",
+			class: "api-banner-dismiss",
+			onclick: (e) => {
+				e.preventDefault();
+				banner.remove();
+			}
+		}, "✕")));
+		return banner;
+	}
+	/**
+	* Copy coefficient template to clipboard and link to the GitHub folder.
+	*/
+	function createCopyTemplateBtn({ content }) {
+		const btn = h("a", {
+			href: "#",
+			class: "link colored",
+			onclick: (e) => {
+				e.preventDefault();
+				navigator.clipboard.writeText(content).then(() => {
+					btn.textContent = "Copié !";
+					btn.classList.add("coeff-copied");
+				});
+			}
+		}, "Copier les codes");
+		return btn;
+	}
+	function renderApp(container, { name, marks, averages, filters, filtersValues, updates, coeffSource, coeffTemplate, apiError, onSemesterChange }) {
 		container.replaceChildren();
 		container.appendChild(h("div", { id: "background" }, html("div", {
 			id: "top-triangle",
@@ -1147,28 +1267,24 @@
 				e.preventDefault();
 				window.location.href = "https://ionisepita-auth.np-auriga.nfrance.net/auth/realms/npionisepita/protocol/openid-connect/logout?post_logout_redirect_uri=" + encodeURIComponent("https://auriga.epita.fr");
 			}
-		}, "Se deconnecter")] : []), h("div", { id: "main" }, h("div", { class: "content" }, h("div", { class: "filters" }, ...filters.map((f) => renderComboBox(f.name, f.values, filtersValues[f.id], (choice) => {
+		}, "Se deconnecter")] : []), h("div", { id: "main" }, h("div", { class: "content" }, ...apiError ? [createApiBanner(apiError, onSemesterChange, filtersValues)] : [], h("div", { class: "filters" }, ...filters.map((f) => renderComboBox(f.name, f.values, filtersValues[f.id], (choice) => {
 			if (f.id === "semester") onSemesterChange(choice.value);
 		}))), h("div", { class: "header" }, "Derniers changements", h("hr")), ...visibleUpdates.length === 0 ? [h("div", { class: "no-updates" }, "Aucun changement depuis votre derniere visite.")] : [], h("div", { class: "updates" }, ...visibleUpdates.map(renderUpdate)), h("div", { class: "header" }, "Moyennes", h("hr")), h("div", { class: "big-list" }, ...avgEntries.map((e) => h("div", { class: "entry" }, h("div", { class: "point" }), h("div", { class: "name" }, e.label), h("div", { class: "point small" }), h("div", { class: "mark" }, h("span", {
 			class: "value",
 			style: { color: e.colored ? gradeColor(e.value) : "auto" }
-		}, formatGrade(e.value)), "\xA0/ 20")))), h("div", { class: "coeff-info" }, h("div", { class: "coeff-main" }, h("div", { class: "point" }), h("div", { class: "coeff-content" }, coeffSource ? h("span", {}, "Coefficients corrigés par la communauté") : h("span", {}, "Coefficients non corrigés ", h("span", { class: "coeff-muted" }, "(Auriga les considère tous égaux)")))), h("div", { class: "coeff-links" }, ...coeffSource ? [
-			h("a", {
-				href: `${app.repository}/blob/master/src/lib/coefficients/${coeffSource}`,
-				target: "_blank",
-				class: "link colored"
-			}, "Voir la source"),
+		}, formatGrade(e.value)), "\xA0/ 20")))), h("div", { class: "coeff-info" }, h("div", { class: "coeff-main" }, h("div", { class: "point" }), h("div", { class: "coeff-content" }, coeffSource ? h("span", {}, "Coefficients corrigés par la communauté") : h("span", {}, "Coefficients non corrigés ", h("span", { class: "coeff-muted" }, "(Auriga les considère tous égaux)")))), h("div", { class: "coeff-links" }, ...coeffSource ? [h("a", {
+			href: `${app.repository}/blob/master/src/lib/coefficients/${coeffSource}`,
+			target: "_blank",
+			class: "link colored"
+		}, "Voir la source"), ...coeffTemplate ? ["\xA0·\xA0", createCopyTemplateBtn(coeffTemplate)] : []] : [
+			createCopyTemplateBtn(coeffTemplate),
 			"\xA0·\xA0",
 			h("a", {
 				href: `${app.repository}/tree/master/src/lib/coefficients`,
 				target: "_blank",
 				class: "link colored"
-			}, "Modifier")
-		] : [h("a", {
-			href: `${app.repository}/tree/master/src/lib/coefficients`,
-			target: "_blank",
-			class: "link colored"
-		}, "Contribuer les vrais coefficients")])), h("hr", { class: "separator" }), ...moduleEls)), renderFooter()));
+			}, "Contribuer")
+		])), h("hr", { class: "separator" }), ...moduleEls)), renderFooter()));
 	}
 	var init_app = __esmMin((() => {
 		init_app$1();
@@ -1259,6 +1375,10 @@
 			let { filtersValues } = session;
 			const { name, filters } = session;
 			async function refresh() {
+				const onSemesterChange = (value) => {
+					filtersValues = saveSemesterFilter(value);
+					refresh();
+				};
 				try {
 					const s = renderLoadingScreen(container);
 					setApiRequestHook((url) => s.request(url));
@@ -1268,19 +1388,44 @@
 						filters,
 						filtersValues,
 						...data,
-						onSemesterChange(value) {
-							filtersValues = saveSemesterFilter(value);
-							refresh();
-						}
+						onSemesterChange
 					});
 				} catch (err) {
 					console.error("[Infinity Auriga]", err);
-					renderError(container, err);
+					const cached = loadCachedMarks(filtersValues);
+					if (cached) renderApp(container, {
+						name,
+						filters,
+						filtersValues,
+						...cached,
+						apiError: err,
+						onSemesterChange
+					});
+					else renderError(container, err);
 				}
 			}
 			await refresh();
 		} catch (err) {
 			console.error("[Infinity Auriga]", err);
+			const savedFilter = localStorage.getItem("auriga_filters");
+			if (savedFilter) {
+				const filtersValues = JSON.parse(savedFilter);
+				const cached = loadCachedMarks(filtersValues);
+				if (cached) {
+					renderApp(container, {
+						name: "Etudiant",
+						filters: [],
+						filtersValues,
+						...cached,
+						apiError: err,
+						onSemesterChange(value) {
+							localStorage.setItem("auriga_filters", JSON.stringify({ semester: value }));
+							window.location.reload();
+						}
+					});
+					return;
+				}
+			}
 			renderError(container, err);
 		}
 	}

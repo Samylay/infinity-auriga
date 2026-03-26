@@ -3,18 +3,85 @@
  */
 
 import { app } from '../app.js';
-import { h, html, gradeColor, formatGrade, gradeSpan, topTriangle, bottomTriangle, LogoSvg } from './dom.js';
+import { h, html, gradeColor, formatGrade, topTriangle, bottomTriangle, LogoSvg } from './dom.js';
 import { copyCodeEl } from './tooltip.js';
 import { renderComboBox, renderUpdate, renderSubject, renderFooter } from './components.js';
 
-export function renderApp(container, { name, marks, averages, filters, filtersValues, updates, coeffSource, onSemesterChange }) {
+/**
+ * Build the error panel shown in the #background sidebar when the API fails.
+ * Adapts its message depending on whether cached grades are available.
+ */
+function createApiErrorPanel(error, hasCachedData) {
+    const message = error?.message || String(error);
+
+    let hint = '';
+    if (message.includes('Menu entries not found') || message.includes('menu')) {
+        hint = 'Le format du menu Auriga a peut-être changé. ';
+    } else if (message.includes('API error') || message.includes('fetch')) {
+        hint = 'Le serveur Auriga ne répond pas correctement. ';
+    } else if (message.includes('access token') || message.includes('401')) {
+        hint = 'Votre session a expiré. ';
+    } else if (message.includes('API format changed') || message.includes('parse')) {
+        hint = 'Le format des données Auriga a changé. ';
+    }
+
+    const desc = hasCachedData
+        ? hint + 'Vos notes en cache sont affichées à droite, mais elles peuvent être obsolètes.'
+        : hint + 'Essayez de recharger la page. Si le problème persiste, signalez-le.';
+
+    const reportUrl = `${app.repository}/issues/new?title=${encodeURIComponent('Erreur: ' + message.substring(0, 80))}&body=${encodeURIComponent('## Erreur\n```\n' + message + '\n```\n\n## Contexte\n- Version: ' + app.version + '\n- URL: ' + window.location.href + '\n- Date: ' + new Date().toISOString())}`;
+
+    return h('div', { class: 'api-error-panel' },
+        h('div', { class: 'api-error-title' }, 'Oups, quelque chose a cassé'),
+        h('div', { class: 'api-error-desc' }, desc),
+        h('pre', { class: 'api-error-box' }, message),
+        h('div', { class: 'api-error-actions' },
+            h('button', {
+                class: 'api-error-btn primary',
+                onclick: () => window.location.reload(),
+            }, 'Recharger'),
+            h('a', {
+                href: reportUrl, target: '_blank', class: 'api-error-btn',
+            }, 'Signaler'),
+            h('button', {
+                class: 'api-error-btn muted',
+                onclick: () => { localStorage.clear(); window.location.reload(); },
+            }, 'Reset cache'),
+        )
+    );
+}
+
+/**
+ * Copy coefficient template to clipboard.
+ */
+function createCopyTemplateBtn({ content }) {
+    const btn = h('a', {
+        href: '#', class: 'link colored',
+        onclick: (e) => {
+            e.preventDefault();
+            navigator.clipboard.writeText(content).then(() => {
+                btn.textContent = 'Copié !';
+                btn.classList.add('coeff-copied');
+            });
+        }
+    }, 'Copier les codes');
+    return btn;
+}
+
+export function renderApp(container, { name, marks, averages, filters, filtersValues, updates, coeffSource, coeffTemplate, apiError, onSemesterChange }) {
     container.replaceChildren();
 
-    // Background
-    container.appendChild(h('div', { id: 'background' },
-        html('div', { id: 'top-triangle', class: 'triangle' }, topTriangle),
-        html('div', { id: 'bottom-triangle', class: 'triangle' }, bottomTriangle)
-    ));
+    const hasCachedData = marks.length > 0;
+
+    // Left side: error panel or decorative background
+    container.appendChild(
+        apiError
+            ? h('div', { id: 'background' }, createApiErrorPanel(apiError, hasCachedData))
+            : h('div', { id: 'background' },
+                html('div', { id: 'top-triangle', class: 'triangle' }, topTriangle),
+                html('div', { id: 'bottom-triangle', class: 'triangle' }, bottomTriangle)
+            )
+    );
 
     const visibleUpdates = updates.filter(u => u.type !== 'average-update');
 
@@ -25,7 +92,7 @@ export function renderApp(container, { name, marks, averages, filters, filtersVa
 
     const moduleEls = marks.flatMap(mod => {
         const modOverriddenEl = mod._overridden
-            ? h('span', { class: 'coeff-override' }, `\u00d7${mod.coefficient}`)
+            ? h('span', { class: 'coeff-override' }, `${mod.coefficient} ECTS`)
             : null;
         return [
         h('div', { class: 'header module' },
@@ -44,63 +111,78 @@ export function renderApp(container, { name, marks, averages, filters, filtersVa
         ...mod.subjects.map(s => renderSubject(s, mod.id))
     ];});
 
+    // Right side: content panel
     container.appendChild(h('div', { id: 'content', class: 'variable wide' },
         h('div', { id: 'header' },
             html('div', { id: 'logo', class: 'variable' }, LogoSvg),
             ...(name ? [h('a', { id: 'logout', href: '#', onclick: (e) => {
                 e.preventDefault();
-                // Redirect to Keycloak logout — ends the SSO session and redirects back to Auriga
                 window.location.href = 'https://ionisepita-auth.np-auriga.nfrance.net/auth/realms/npionisepita/protocol/openid-connect/logout?post_logout_redirect_uri=' + encodeURIComponent('https://auriga.epita.fr');
             } }, 'Se deconnecter')] : [])
         ),
         h('div', { id: 'main' },
             h('div', { class: 'content' },
-                h('div', { class: 'filters' },
-                    ...filters.map(f => renderComboBox(f.name, f.values, filtersValues[f.id], (choice) => {
-                        if (f.id === 'semester') onSemesterChange(choice.value);
-                    }))
-                ),
-                h('div', { class: 'header' }, 'Derniers changements', h('hr')),
-                ...(visibleUpdates.length === 0
-                    ? [h('div', { class: 'no-updates' }, 'Aucun changement depuis votre derniere visite.')]
-                    : []),
-                h('div', { class: 'updates' }, ...visibleUpdates.map(renderUpdate)),
-                h('div', { class: 'header' }, 'Moyennes', h('hr')),
-                h('div', { class: 'big-list' }, ...avgEntries.map(e =>
-                    h('div', { class: 'entry' },
-                        h('div', { class: 'point' }),
-                        h('div', { class: 'name' }, e.label),
-                        h('div', { class: 'point small' }),
-                        h('div', { class: 'mark' },
-                            h('span', { class: 'value', style: { color: e.colored ? gradeColor(e.value) : 'auto' } }, formatGrade(e.value)),
-                            '\u00a0/ 20'
-                        )
-                    )
-                )),
-                h('div', { class: 'coeff-info' },
-                    h('div', { class: 'coeff-main' },
-                        h('div', { class: 'point' }),
-                        h('div', { class: 'coeff-content' },
-                            coeffSource
-                                ? h('span', {}, 'Coefficients corrigés par la communauté')
-                                : h('span', {}, 'Coefficients non corrigés ', h('span', { class: 'coeff-muted' }, '(Auriga les considère tous égaux)'))
-                        )
+                // Sidebar content (filters, updates, averages) — hidden when error is shown in sidebar
+                ...(!apiError ? [
+                    h('div', { class: 'filters' },
+                        ...filters.map(f => renderComboBox(f.name, f.values, filtersValues[f.id], (choice) => {
+                            if (f.id === 'semester') onSemesterChange(choice.value);
+                        }))
                     ),
-                    h('div', { class: 'coeff-links' },
-                        ...(coeffSource
-                            ? [
-                                h('a', { href: `${app.repository}/blob/master/src/lib/coefficients/${coeffSource}`, target: '_blank', class: 'link colored' }, 'Voir la source'),
-                                '\u00a0\u00b7\u00a0',
-                                h('a', { href: `${app.repository}/tree/master/src/lib/coefficients`, target: '_blank', class: 'link colored' }, 'Modifier'),
-                            ]
-                            : [
-                                h('a', { href: `${app.repository}/tree/master/src/lib/coefficients`, target: '_blank', class: 'link colored' }, 'Contribuer les vrais coefficients'),
-                            ]
+                    h('div', { class: 'header' }, 'Derniers changements', h('hr')),
+                    ...(visibleUpdates.length === 0
+                        ? [h('div', { class: 'no-updates' }, 'Aucun changement depuis votre derniere visite.')]
+                        : []),
+                    h('div', { class: 'updates' }, ...visibleUpdates.map(renderUpdate)),
+                    h('div', { class: 'header' }, 'Moyennes', h('hr')),
+                    h('div', { class: 'big-list' }, ...avgEntries.map(e =>
+                        h('div', { class: 'entry' },
+                            h('div', { class: 'point' }),
+                            h('div', { class: 'name' }, e.label),
+                            h('div', { class: 'point small' }),
+                            h('div', { class: 'mark' },
+                                h('span', { class: 'value', style: { color: e.colored ? gradeColor(e.value) : 'auto' } }, formatGrade(e.value)),
+                                '\u00a0/ 20'
+                            )
                         )
-                    )
-                ),
-                h('hr', { class: 'separator' }),
-                ...moduleEls
+                    )),
+                ] : []),
+                // Grade content or empty state
+                ...(!hasCachedData && apiError
+                    ? [h('div', { class: 'empty-state' },
+                        h('div', { class: 'empty-state-text' }, 'Aucune note en cache'),
+                        h('div', { class: 'empty-state-hint' }, 'Les notes seront disponibles ici une fois la connexion rétablie.')
+                    )]
+                    : [
+                        h('div', { class: 'coeff-info' },
+                            h('div', { class: 'coeff-main' },
+                                h('div', { class: 'point' }),
+                                h('div', { class: 'coeff-content' },
+                                    coeffSource
+                                        ? h('span', {}, 'Coefficients corrigés par la communauté')
+                                        : h('span', {}, 'Coefficients non corrigés ', h('span', { class: 'coeff-muted' }, '(Auriga les considère tous égaux)'))
+                                )
+                            ),
+                            h('div', { class: 'coeff-links' },
+                                ...(coeffSource
+                                    ? [
+                                        h('a', { href: import.meta.env.DEV
+                                            ? `/src/lib/coefficients/${coeffSource}`
+                                            : `${app.repository}/blob/master/src/lib/coefficients/${coeffSource}`,
+                                            target: '_blank', class: 'link colored' }, 'Voir la source'),
+                                        ...(coeffTemplate ? ['\u00a0\u00b7\u00a0', createCopyTemplateBtn(coeffTemplate)] : []),
+                                    ]
+                                    : [
+                                        ...(coeffTemplate ? [createCopyTemplateBtn(coeffTemplate), '\u00a0\u00b7\u00a0'] : []),
+                                        h('a', { href: `${app.repository}/tree/master/src/lib/coefficients`, target: '_blank', class: 'link colored' }, 'Contribuer'),
+                                    ]
+                                )
+                            )
+                        ),
+                        h('hr', { class: 'separator' }),
+                        ...moduleEls,
+                    ]
+                )
             )
         ),
         renderFooter()

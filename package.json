@@ -1,15 +1,18 @@
 {
   "name": "infinity-auriga",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "author": "KazeTachinuu",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "build:userscript": "vite build --config vite.config.userscript.js",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "devDependencies": {
-    "vite": "^8.0.0"
+    "vite": "^8.0.0",
+    "vitest": "^4.1.1"
   }
 }

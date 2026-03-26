@@ -94,9 +94,9 @@ export function renderSubject(subject, moduleId) {
 
     const metaParts = [];
     if (subject.classAverage != null) metaParts.push(`promo: ${formatGrade(subject.classAverage)}`);
-    if (subject.coefficient != null && subject.coefficient !== 1) metaParts.push(`coeff. ${formatGrade(subject.coefficient)}`);
+    if (!subject._overridden && subject.coefficient != null && subject.coefficient !== 1) metaParts.push(`coeff. ${formatGrade(subject.coefficient)}`);
     const subOverriddenEl = subject._overridden
-        ? h('span', { class: 'coeff-override' }, `\u00d7${subject.coefficient}`)
+        ? h('span', { class: 'coeff-override' }, `${subject.coefficient} ECTS`)
         : null;
 
     const info = h('div', { class: 'info' },
@@ -111,20 +111,21 @@ export function renderSubject(subject, moduleId) {
         h('hr', { class: 'bottom-line' })
     );
 
-    // Right side: always show marks panel with full name header
-    const marksContent = subject.marks.map(mark => {
+    // Right side: marks panel, with group headers when marks share a course name
+    function renderMark(mark) {
         const meta = [];
         if (mark.classAverage != null) meta.push(`moyenne: ${formatGrade(mark.classAverage)}`);
         if (!hasEqualCoefficients(subject) && !mark._overridden) meta.push(`${Math.round(mark.coefficient * 100)}%`);
         const overriddenEl = mark._overridden && mark._rawCoefficient != null
-            ? h('span', { class: 'coeff-override' }, `\u00d7${mark._rawCoefficient}`)
+            ? h('span', { class: 'coeff-override' }, `${mark._rawCoefficient} ECTS`)
             : null;
 
-        // Strip subject name prefix from mark name to avoid redundancy
+        // Strip subject/group name prefix from mark name to avoid redundancy
         let markName = mark.name;
-        if (fullName) {
-            if (markName.startsWith(fullName + ' - ')) markName = markName.slice(fullName.length + 3);
-            else if (markName.startsWith(fullName + ' ')) markName = markName.slice(fullName.length + 1);
+        const prefix = mark._group || fullName;
+        if (prefix) {
+            if (markName.startsWith(prefix + ' - ')) markName = markName.slice(prefix.length + 3);
+            else if (markName.startsWith(prefix + ' ')) markName = markName.slice(prefix.length + 1);
         }
 
         return h('div', { class: 'mark' },
@@ -139,12 +140,23 @@ export function renderSubject(subject, moduleId) {
                 ...(overriddenEl ? [overriddenEl] : [])
             )] : [])
         );
-    });
+    }
+
+    // Build marks list, inserting group headers when _group changes
+    const marksContent = [];
+    let lastGroup = null;
+    for (const mark of subject.marks) {
+        if (mark._group && mark._group !== lastGroup) {
+            marksContent.push(h('div', { class: 'marks-title' }, mark._group));
+            lastGroup = mark._group;
+        }
+        marksContent.push(renderMark(mark));
+    }
 
     const marksEl = subject.marks.length === 0
         ? h('div', { class: 'no-marks' }, 'Aucune note')
         : h('div', { class: 'marks' },
-            ...(fullName && !useNameAsLabel ? [h('div', { class: 'marks-title' }, fullName)] : []),
+            ...(fullName && !useNameAsLabel && !lastGroup ? [h('div', { class: 'marks-title' }, fullName)] : []),
             ...marksContent
         );
 

@@ -1,61 +1,53 @@
 # Coefficients
 
-Auriga treats all exams as equally weighted. This directory contains the **real** coefficients, contributed by the community.
+Auriga treats all exams as equally weighted. This directory contains **ECTS weights** from the official syllabus, contributed by the community.
 
-The student average is a **flat weighted average** of all marks: `Σ(mark × coef) / Σ(coef)`. Subject and module weights are derived from the sum of their children's coefficients automatically.
+The student average is computed hierarchically — matching the official bulletin:
+1. Marks within a subject are averaged equally
+2. Subject averages are weighted by their coefficient
+3. Module averages are weighted by their ECTS
 
 ## How to add coefficients for your semester
 
-### 1. Find your codes
+### 1. Get your ECTS from the syllabus
 
-**Hover** any mark name in Infinity Auriga — a tooltip shows its full code. **Click** to copy it to your clipboard.
+Check your official bulletin or syllabus for the ECTS per UE/SAE.
 
-Every copyable name has a <u>dashed underline</u> to indicate it's clickable.
+### 2. Copy the template
 
-![Hover a name to see its code, click to copy](../../../docs/img/copy-code.png)
+In Infinity Auriga, click **Copier les codes** — a pre-filled template with all your module codes is copied to your clipboard.
 
-### Code anatomy
+### 3. Fill in the ECTS
 
-```
-2526_I_INF_FISA_S07_CS_GR_WS_EX
-│    │ │   │    │   │  │  │  └─ eval type (EX, PRJ, EXF, ...)
-│    │ │   │    │   │  │  └──── exam
-│    │ │   │    │   │  └─────── subject
-│    │ │   │    │   └────────── module
-│    │ │   │    └────────────── semester
-│    │ │   └─────────────────── track (FISA, FISE, GISTRE, ...)
-│    │ └─────────────────────── school
-│    └───────────────────────── always I
-└────────────────────────────── academic year (25/26)
-```
-
-### 2. Create a file
-
-Filename: `s{semester}_{year}_{track}.js` (all lowercase)
-
-| Semester | Year | Track | Filename |
-|----------|------|-------|----------|
-| S07 | 2025/2026 | FISA | `s07_2526_fisa.js` |
-| S08 | 2025/2026 | FISE | `s08_2526_fise.js` |
-| S09 | 2026/2027 | GISTRE | `s09_2627_gistre.js` |
-
-### 3. Fill in your coefficients
-
-Use the full exam code for each mark. Only list entries whose coefficient is NOT 1:
+Replace the `1`s with the ECTS from your syllabus. Delete or comment out lines where the ECTS is 1 (the default).
 
 ```js
-/**
- * Coefficients — S?? TRACK YEAR
- * Only list entries whose coefficient is NOT 1.
- */
 export default {
-    'XXXX_I_INF_TRACK_SXX_AEE_EAE3_EX': 8,          // Alternance
-    'XXXX_I_INF_TRACK_SXX_CS_GR_WS_EX': 2,           // Windows sécurité
+    '2526_I_INF_FISA_S07_CN': 3,          // Concevoir
+    '2526_I_INF_FISA_S07_FR': 2,          // Formaliser
+    '2526_I_INF_FISA_S07_GR': 3,          // Gérer
+    '2526_I_INF_FISA_S07_AEE': 8,         // SAE Evaluation
+    // AG and PL are 1 ECTS — default, not listed
 };
 ```
 
+The ECTS applies to the **module** (UE/SAE). All subjects within a module are weighted equally.
+
+### Promoting a subject to its own module
+
+Sometimes Auriga groups subjects from **different UEs** under the same code prefix. For example, "Projet Shell" (SAE 42SH, 2 ECTS) shares the `PR` prefix with "Assembleur" (UE Produire, 3 ECTS).
+
+To separate them, use an object override with `module` and `name` to promote the subject to its own module in the UI:
+
+```js
+    '2526_I_INF_FISA_S07_PR': 3,          // Produire (keeps Assembleur)
+    '2526_I_INF_FISA_S07_PR_42SH': { ects: 2, module: 'SAE 42SH', name: 'Projet Shell' },
+```
+
+This detaches "Projet Shell" from "Produire" and gives it its own module header "SAE 42SH" with 2 ECTS. Subjects promoted to the same `module` name are merged together.
+
+### 4. Create a pull request
+
+Create the file on GitHub (click **Contribuer** in the app) and open a PR. No other file to edit — coefficient files are auto-discovered at build time.
+
 See [`s07_2526_fisa.js`](s07_2526_fisa.js) for a real example.
-
-### 4. Open a pull request
-
-That's it. No other file to edit — coefficient files are auto-discovered at build time.
