@@ -7,6 +7,7 @@ export const meta = {
     year: '2526',
     track: 'FISA',
     major: 'DEV',
+    name: 'Développement web et nouvelles applications',
 };
 
 export default {

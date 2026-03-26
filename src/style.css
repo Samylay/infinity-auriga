@@ -157,6 +157,11 @@ button:not(.opaque):active, a:not(.opaque):active, .clickable:not(.opaque):activ
 .big-list .entry .mark { margin-left: 10px; }
 .big-list .entry .mark .value { font-weight: bold; }
 
+/* ===== TRACK INFO ===== */
+.track-info { flex-direction: column; }
+.track-info-name { font-weight: bold; font-size: var(--font-header); }
+.track-info-detail { font-size: clamp(12px, 1.4vw, 15px); color: var(--text-muted); margin-top: 2px; }
+
 /* ===== COEFFICIENT INFO ===== */
 .coeff-info { flex-direction: column; margin-top: 8px; padding-left: clamp(15px, 3vw, 35px); font-size: clamp(14px, 1.8vw, 18px); }
 .coeff-main { align-items: center; gap: 12px; font-weight: 500; }

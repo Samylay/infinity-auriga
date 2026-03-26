@@ -68,7 +68,7 @@ function createCopyTemplateBtn({ content }) {
     return btn;
 }
 
-export function renderApp(container, { name, marks, averages, filters, filtersValues, updates, coeffSource, coeffTemplate, apiError, onSemesterChange }) {
+export function renderApp(container, { name, marks, averages, filters, filtersValues, updates, coeffSource, coeffMeta, coeffTemplate, apiError, onSemesterChange }) {
     container.replaceChildren();
 
     const hasCachedData = marks.length > 0;
@@ -154,6 +154,15 @@ export function renderApp(container, { name, marks, averages, filters, filtersVa
                         h('div', { class: 'empty-state-hint' }, 'Les notes seront disponibles ici une fois la connexion rétablie.')
                     )]
                     : [
+                        ...(coeffMeta ? [
+                            h('div', { class: 'header' },
+                                h('div', { class: 'track-info' },
+                                    h('span', { class: 'track-info-name' }, coeffMeta.name || [coeffMeta.track, coeffMeta.major].filter(Boolean).join(' ')),
+                                    h('span', { class: 'track-info-detail' }, `${coeffMeta.track} ${coeffMeta.semester} — 20${coeffMeta.year.slice(0, 2)}/20${coeffMeta.year.slice(2)}`),
+                                ),
+                                h('hr'),
+                            ),
+                        ] : []),
                         h('div', { class: 'coeff-info' },
                             h('div', { class: 'coeff-main' },
                                 h('div', { class: 'point' }),

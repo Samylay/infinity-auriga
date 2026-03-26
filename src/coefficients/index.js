@@ -70,6 +70,7 @@ export function generateTemplate(marks, semesterKey, track, major = null, overri
         `    year: '${year}',`,
         `    track: '${track}',`,
         ...(major ? [`    major: '${major.toUpperCase()}',`] : [`    major: null,`]),
+        `    name: '',  // TODO: fill in display name`,
         `};`,
         ``,
         `export default {`,

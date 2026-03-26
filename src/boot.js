@@ -2,7 +2,7 @@ import { setApiRequestHook } from './auriga/api.js';
 import { loadSession, fetchMarksAndUpdates, saveSemesterFilter, loadSavedFilters, loadCachedMarks } from './session.js';
 import { setupToggle } from './toggle.js';
 
-const EMPTY_DATA = { marks: [], averages: { student: null, promo: null }, updates: [], coeffSource: null, coeffTemplate: null };
+const EMPTY_DATA = { marks: [], averages: { student: null, promo: null }, updates: [], coeffSource: null, coeffMeta: null, coeffTemplate: null };
 
 /**
  * Shared boot sequence for both dev (main.js) and prod (userscript-entry.js).

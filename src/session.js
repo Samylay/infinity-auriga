@@ -75,6 +75,7 @@ export async function fetchMarksAndUpdates(filtersValues, status) {
         averages: { student: average, promo: classAverage },
         updates,
         coeffSource: coeffData?.file ?? null,
+        coeffMeta: coeffData?.meta ?? null,
         coeffTemplate,
     };
 }
@@ -98,6 +99,7 @@ export async function loadCachedMarks(filtersValues) {
         averages: { student: average, promo: null },
         updates: updates[key] || [],
         coeffSource: coeffData?.file ?? null,
+        coeffMeta: coeffData?.meta ?? null,
         coeffTemplate,
     };
 }

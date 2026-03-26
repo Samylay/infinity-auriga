@@ -7,6 +7,7 @@ export const meta = {
     year: '2526',
     track: 'FISA',
     major: 'CS',
+    name: 'Cybersécurité et Systèmes',
 };
 
 export default {
