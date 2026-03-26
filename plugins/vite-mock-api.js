@@ -42,7 +42,6 @@ export default function mockApiPlugin() {
                 req.on('data', chunk => body += chunk);
                 req.on('end', () => {
                     const match = findMatch(method, url);
-                    // Simulate network latency (300-800ms)
                     const delay = 300 + Math.random() * 500;
                     setTimeout(() => {
                         if (match) {

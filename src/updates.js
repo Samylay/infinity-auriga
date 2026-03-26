@@ -63,13 +63,12 @@ export function getUpdates(filters, marks) {
     return result;
 }
 
-/**
- * Add or merge an update entry into the result list.
- */
+/** Add or merge an update entry into the result list. */
 function pushUpdate(result, subjectId, type, id, name, value, old) {
     const existing = result.find(u => u.subject === subjectId && u.id === id && u.name === name);
 
-    if (existing && (!(existing.type === 'average-update' || type === 'average-update') || existing.type === type)) {
+    const canMerge = existing && (existing.type === type || (existing.type !== 'average-update' && type !== 'average-update'));
+    if (canMerge) {
         existing.type = type;
         existing.date = new Date();
         existing.value = value;
@@ -88,9 +87,7 @@ function pushUpdate(result, subjectId, type, id, name, value, old) {
     });
 }
 
-/**
- * Remove updates older than the expiration delay.
- */
+/** Remove updates older than the expiration delay. */
 function removeExpired(updates) {
     const cutoff = Date.now() - UPDATE_EXPIRATION_MS;
     return updates.filter(u => new Date(u.date).getTime() > cutoff);

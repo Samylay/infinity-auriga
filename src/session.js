@@ -11,18 +11,37 @@ function detectTrack(marks) {
     return firstCode?.split('_')[3] ?? null;
 }
 
+/**
+ * Detect major (e.g. "cs") from the transparent prefix in grade codes.
+ * After buildGradeTree, the transparent prefix (CS, DEV, ...) is stripped
+ * from module IDs but still present in raw mark codes. If mark._code has a
+ * path segment that doesn't match its module ID, that segment is the major.
+ */
+export function detectMajor(marks) {
+    for (const mod of marks) {
+        for (const sub of mod.subjects) {
+            for (const mark of sub.marks) {
+                const parts = mark._code.split('_');
+                if (parts.length < 7) continue;
+                const afterSem = parts[5];
+                if (afterSem !== mod.id) return afterSem.toLowerCase();
+            }
+        }
+    }
+    return null;
+}
+
 /** Load coefficients + generate template for a given marks tree. */
 async function loadCoeffData(marks, filtersValues) {
     const track = detectTrack(marks);
     if (!track) return { coeffData: null, coeffTemplate: null };
-    const coeffData = await loadCoefficients(filtersValues.semester, track);
-    const coeffTemplate = generateTemplate(marks, filtersValues.semester, track, coeffData?.overrides ?? null);
+    const major = detectMajor(marks);
+    const coeffData = await loadCoefficients(filtersValues.semester, track, major);
+    const coeffTemplate = generateTemplate(marks, filtersValues.semester, track, major, coeffData?.overrides ?? null);
     return { coeffData, coeffTemplate };
 }
 
-/**
- * Load initial session: user name, available filters, last selection.
- */
+/** Load initial session: user name, available filters, last selection. */
 export async function loadSession(status) {
     status?.step('Récupération du profil...');
     const name = await getName().catch(() => 'Etudiant');
@@ -39,9 +58,7 @@ export async function loadSession(status) {
     return { name, filters, filtersValues };
 }
 
-/**
- * Fetch marks, apply coefficient overrides, compute updates.
- */
+/** Fetch marks, apply coefficient overrides, and compute updates. */
 export async function fetchMarksAndUpdates(filtersValues, status) {
     status?.step('Récupération des notes...');
     const { marks, classAverage } = await getMarks(filtersValues);
@@ -62,10 +79,7 @@ export async function fetchMarksAndUpdates(filtersValues, status) {
     };
 }
 
-/**
- * Try to load marks from localStorage cache (saved by the updates system).
- * Returns a render-ready data object, or null if no cache exists.
- */
+/** Load marks from localStorage cache, or null if no cache exists. */
 export async function loadCachedMarks(filtersValues) {
     const save = JSON.parse(localStorage.getItem('auriga_marks_save') || '{}');
     const key = JSON.stringify(filtersValues);
@@ -88,17 +102,13 @@ export async function loadCachedMarks(filtersValues) {
     };
 }
 
-/**
- * Load saved semester filter from localStorage.
- */
+/** Load saved semester filter from localStorage. */
 export function loadSavedFilters() {
     const saved = localStorage.getItem(FILTERS_KEY);
     return saved ? JSON.parse(saved) : {};
 }
 
-/**
- * Persist semester selection.
- */
+/** Persist semester selection to localStorage. */
 export function saveSemesterFilter(value) {
     const filtersValues = { semester: value };
     localStorage.setItem(FILTERS_KEY, JSON.stringify(filtersValues));

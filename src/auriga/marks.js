@@ -45,11 +45,7 @@ async function getMenuConfig() {
 let _cachedSynthesisEntries = null;
 let _componentTypesPromise;
 
-/**
- * Fetch component type map from the pedagogical registration endpoint.
- * Returns a Map<examCode, componentType> (e.g. "Semester", "EU Resource", etc.)
- * Falls back to null if the endpoint is unavailable.
- */
+/** Fetch component type map from the pedagogical endpoint, or null if unavailable. */
 function getComponentTypes() {
     if (_componentTypesPromise) return _componentTypesPromise;
 
@@ -115,7 +111,6 @@ export async function getMarks(filters) {
 
     const config = await getMenuConfig();
 
-    // Fetch grades, synthesis, and component types in parallel
     const [rawGrades, synthesisEntries, componentTypes] = await Promise.all([
         fetchAllSearchResults(config.grades.menuEntryId, config.grades.queryId)
             .then(raw => {

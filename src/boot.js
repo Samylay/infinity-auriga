@@ -1,6 +1,6 @@
-import { setApiRequestHook } from './lib/auriga/api.js';
-import { loadSession, fetchMarksAndUpdates, saveSemesterFilter, loadSavedFilters, loadCachedMarks } from './lib/session.js';
-import { setupToggle } from './lib/toggle.js';
+import { setApiRequestHook } from './auriga/api.js';
+import { loadSession, fetchMarksAndUpdates, saveSemesterFilter, loadSavedFilters, loadCachedMarks } from './session.js';
+import { setupToggle } from './toggle.js';
 
 const EMPTY_DATA = { marks: [], averages: { student: null, promo: null }, updates: [], coeffSource: null, coeffTemplate: null };
 

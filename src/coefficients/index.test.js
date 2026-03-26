@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { generateTemplate, applyCoefficients } from './index.js';
+import { generateTemplate, applyCoefficients, parseFilename } from './index.js';
+import { detectMajor } from '../session.js';
 
 // Minimal grade tree matching the structure built by buildGradeTree
 function makeMarks() {
@@ -34,39 +35,121 @@ function makeMarks() {
     ];
 }
 
-describe('generateTemplate', () => {
-    it('generates a valid JS module with module-level codes', () => {
-        const { filename, content } = generateTemplate(makeMarks(), 'S07_2526', 'FISA');
+describe('parseFilename', () => {
+    it('parses major-specific filename', () => {
+        expect(parseFilename('./s07_2526_fisa_cs.js')).toEqual({
+            semester: 'S07', year: '2526', track: 'FISA', major: 'CS',
+        });
+    });
 
-        expect(filename).toBe('s07_2526_fisa.js');
+    it('parses track-only filename', () => {
+        expect(parseFilename('./s08_2627_gistre.js')).toEqual({
+            semester: 'S08', year: '2627', track: 'GISTRE', major: null,
+        });
+    });
+
+    it('returns null for invalid paths', () => {
+        expect(parseFilename('./ab.js')).toBeNull();
+    });
+});
+
+describe('detectMajor', () => {
+    it('detects CS major from transparent prefix in mark codes', () => {
+        // After buildGradeTree, mod.id = 'CN' (CS stripped), but mark._code still has CS
+        const marks = [{
+            id: 'CN', _code: '2526_I_INF_FISA_S07_CN', name: 'Concevoir',
+            subjects: [{
+                id: 'CN_AI4SEC', _code: '2526_I_INF_FISA_S07_CN_AI4SEC', name: 'AI4SEC',
+                marks: [{ _code: '2526_I_INF_FISA_S07_CS_CN_AI4SEC_EX' }],
+            }],
+        }];
+        expect(detectMajor(marks)).toBe('cs');
+    });
+
+    it('detects DEV major', () => {
+        const marks = [{
+            id: 'CI', _code: '2526_I_INF_FISA_S07_CI', name: 'CI',
+            subjects: [{
+                id: 'CI_BADG1', _code: '2526_I_INF_FISA_S07_CI_BADG1', name: 'Moteurs',
+                marks: [{ _code: '2526_I_INF_FISA_S07_DEV_CI_BADG1_EX' }],
+            }],
+        }];
+        expect(detectMajor(marks)).toBe('dev');
+    });
+
+    it('returns null when no transparent prefix exists (e.g. GISTRE)', () => {
+        const marks = [{
+            id: 'CN', _code: '2526_I_INF_GISTRE_S08_CN', name: 'Concevoir',
+            subjects: [{
+                id: 'CN_ALGA', _code: '2526_I_INF_GISTRE_S08_CN_ALGA', name: 'Algo',
+                marks: [{ _code: '2526_I_INF_GISTRE_S08_CN_ALGA_EX' }],
+            }],
+        }];
+        expect(detectMajor(marks)).toBeNull();
+    });
+
+    it('returns null for shared modules without major prefix', () => {
+        const marks = [{
+            id: 'PL', _code: '2526_I_INF_FISA_S07_PL', name: 'Piloter',
+            subjects: [{
+                id: 'PL_GPRO2', _code: '2526_I_INF_FISA_S07_PL_GPRO2', name: 'Gestion',
+                marks: [{ _code: '2526_I_INF_FISA_S07_PL_GPRO2_EX' }],
+            }],
+        }];
+        expect(detectMajor(marks)).toBeNull();
+    });
+});
+
+describe('generateTemplate', () => {
+    it('generates a valid JS module with meta and module-level codes', () => {
+        const { filename, content } = generateTemplate(makeMarks(), 'S07_2526', 'FISA', 'cs');
+
+        expect(filename).toBe('s07_2526_fisa_cs.js');
+        expect(content).toContain('export const meta = {');
+        expect(content).toContain("semester: 'S07'");
+        expect(content).toContain("major: 'CS'");
         expect(content).toContain('export default {');
         expect(content).toContain("'2526_I_INF_FISA_S07_CS': 1,");
         expect(content).toContain("'2526_I_INF_FISA_S07_PR': 1,");
         expect(content).toContain('};');
     });
 
+    it('generates filename without major suffix when major is null', () => {
+        const { filename, content } = generateTemplate(makeMarks(), 'S07_2526', 'FISA', null);
+
+        expect(filename).toBe('s07_2526_fisa.js');
+        expect(content).toContain('major: null,');
+    });
+
     it('includes module names as inline comments', () => {
-        const { content } = generateTemplate(makeMarks(), 'S07_2526', 'FISA');
+        const { content } = generateTemplate(makeMarks(), 'S07_2526', 'FISA', 'cs');
 
         expect(content).toContain('// Cybersécurité');
         expect(content).toContain('// Programmation');
     });
 
-    it('includes semester/track/year in the header comment', () => {
-        const { content } = generateTemplate(makeMarks(), 'S07_2526', 'FISA');
-        expect(content).toContain('S07 FISA 2025/2026');
+    it('includes semester/track/major/year in the header comment', () => {
+        const { content } = generateTemplate(makeMarks(), 'S07_2526', 'FISA', 'cs');
+        expect(content).toContain('S07 FISA [CS] 2025/2026');
     });
 
-    it('handles different semester/track combos', () => {
-        const { filename, content } = generateTemplate(makeMarks(), 'S08_2627', 'GISTRE');
+    it('handles different semester/track/major combos', () => {
+        const { filename, content } = generateTemplate(makeMarks(), 'S08_2627', 'FISA', 'dev');
+        expect(filename).toBe('s08_2627_fisa_dev.js');
+        expect(content).toContain('S08 FISA [DEV] 2026/2027');
+    });
+
+    it('omits major label and suffix for tracks without majors', () => {
+        const { content, filename } = generateTemplate(makeMarks(), 'S08_2627', 'GISTRE');
         expect(filename).toBe('s08_2627_gistre.js');
         expect(content).toContain('S08 GISTRE 2026/2027');
+        expect(content).not.toContain('[');
     });
 
     it('skips modules with no marks', () => {
         const marks = makeMarks();
         marks[0].subjects[0].marks = [];
-        const { content } = generateTemplate(marks, 'S07_2526', 'FISA');
+        const { content } = generateTemplate(marks, 'S07_2526', 'FISA', 'cs');
 
         expect(content).not.toContain('Cybersécurité');
         expect(content).toContain('Programmation');
@@ -74,7 +157,7 @@ describe('generateTemplate', () => {
 
     it('pre-fills existing overrides', () => {
         const overrides = new Map([['2526_I_INF_FISA_S07_CS', 3]]);
-        const { content } = generateTemplate(makeMarks(), 'S07_2526', 'FISA', overrides);
+        const { content } = generateTemplate(makeMarks(), 'S07_2526', 'FISA', 'cs', overrides);
         expect(content).toContain("'2526_I_INF_FISA_S07_CS': 3,");
     });
 });

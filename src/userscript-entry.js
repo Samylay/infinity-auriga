@@ -1,5 +1,5 @@
-import { installTokenInterceptor, waitForToken } from './lib/auriga/auth.js';
-import { isInfinityEnabled, setupToggle } from './lib/toggle.js';
+import { installTokenInterceptor, waitForToken } from './auriga/auth.js';
+import { isInfinityEnabled, setupToggle } from './toggle.js';
 import { boot } from './boot.js';
 
 installTokenInterceptor();

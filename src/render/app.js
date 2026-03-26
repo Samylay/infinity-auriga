@@ -167,14 +167,14 @@ export function renderApp(container, { name, marks, averages, filters, filtersVa
                                 ...(coeffSource
                                     ? [
                                         h('a', { href: import.meta.env.DEV
-                                            ? `/src/lib/coefficients/${coeffSource}`
-                                            : `${app.repository}/blob/master/src/lib/coefficients/${coeffSource}`,
+                                            ? `/coefficients/${coeffSource}`
+                                            : `${app.repository}/blob/master/coefficients/${coeffSource}`,
                                             target: '_blank', class: 'link colored' }, 'Voir la source'),
                                         ...(coeffTemplate ? ['\u00a0\u00b7\u00a0', createCopyTemplateBtn(coeffTemplate)] : []),
                                     ]
                                     : [
                                         ...(coeffTemplate ? [createCopyTemplateBtn(coeffTemplate), '\u00a0\u00b7\u00a0'] : []),
-                                        h('a', { href: `${app.repository}/tree/master/src/lib/coefficients`, target: '_blank', class: 'link colored' }, 'Contribuer'),
+                                        h('a', { href: `${app.repository}/tree/master/coefficients`, target: '_blank', class: 'link colored' }, 'Contribuer'),
                                     ]
                                 )
                             )

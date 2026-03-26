@@ -169,7 +169,7 @@ export function renderFooter() {
     const resetLink = h('a', { href: '#', onclick: (e) => { e.preventDefault(); localStorage.clear(); window.location.reload(); } }, 'Reset');
     return h('div', { id: 'footer' },
         h('div', { id: 'links' },
-            h('a', { href: `${app.repository}/tree/master/src/lib/coefficients`, target: '_blank' }, 'Coefficients'),
+            h('a', { href: `${app.repository}/tree/master/coefficients`, target: '_blank' }, 'Coefficients'),
             '\u00a0\u00b7\u00a0',
             h('a', { href: app.repository, target: '_blank' }, 'Sources'),
             '\u00a0\u00b7\u00a0',

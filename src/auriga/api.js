@@ -31,9 +31,10 @@ export async function apiFetch(path, options = {}, _retried = false) {
         },
     });
 
+    const TOKEN_REFRESH_DELAY_MS = 2000;
     if (response.status === 401 && !_retried) {
         // Token expired - wait for Angular to refresh it, then retry once
-        await new Promise(r => setTimeout(r, 2000));
+        await new Promise(r => setTimeout(r, TOKEN_REFRESH_DELAY_MS));
         return apiFetch(path, options, true);
     }
 
@@ -49,10 +50,7 @@ export async function apiFetch(path, options = {}, _retried = false) {
     }
 }
 
-/**
- * Fetch all pages of a search result endpoint.
- * Handles pagination transparently - returns all lines across pages.
- */
+/** Fetch all pages of a search result endpoint, returning all lines across pages. */
 export async function fetchAllSearchResults(menuEntryId, queryId) {
     const queryDef = await apiFetch(`/menuEntries/${menuEntryId}/query/${queryId}`);
     const body = queryDef.queryDefinition;

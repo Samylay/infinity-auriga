@@ -1,6 +1,6 @@
-import { setAccessToken } from './lib/auriga/api.js';
-import { isLogged } from './lib/auriga/auth.js';
-import { isInfinityEnabled, setupToggle } from './lib/toggle.js';
+import { setAccessToken } from './auriga/api.js';
+import { isLogged } from './auriga/auth.js';
+import { isInfinityEnabled, setupToggle } from './toggle.js';
 import { boot } from './boot.js';
 
 if (window.location.hostname === 'localhost') {

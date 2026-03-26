@@ -28,11 +28,11 @@ Auto-updates are built-in. A toggle in the bottom-left lets you switch back to c
 
 Auriga treats all exams as equally weighted. Infinity fixes this with community-contributed coefficient files.
 
-The app shows whether corrected coefficients are active for your semester. If not, you can contribute them — see the [coefficient guide](src/lib/coefficients/README.md).
+The app shows whether corrected coefficients are active for your semester. If not, you can contribute them — see the [coefficient guide](coefficients/README.md).
 
 **Quick version:**
 
-1. Create `src/lib/coefficients/s{semester}_{year}_{track}.js`
+1. Create `coefficients/s{semester}_{year}_{track}.js`
 2. Export exam codes with their real coefficients
 3. Open a PR — no other file to edit
 
