@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Infinity Auriga
 // @namespace    infinity-auriga
-// @version      1.9.3
+// @version      1.9.4
 // @description  Make Auriga Great Again - enhanced grades UI for EPITA
 // @author       KazeTachinuu & contributors
 // @match        https://auriga.epita.fr/*
@@ -834,7 +834,7 @@
 	//#region package.json
 	var version;
 	var init_package = __esmMin((() => {
-		version = "1.9.3";
+		version = "1.9.4";
 	}));
 	//#endregion
 	//#region src/app.js
@@ -885,6 +885,8 @@
 			"2526_I_INF_FISE_S03_PR_GM": 2,
 			"2526_I_INF_FISE_S03_PR_GRAPHS": 3,
 			"2526_I_INF_FISE_S03_PR_NAC": 3,
+			"2526_I_INF_FISE_S03_PR_RIE_EXA": 1,
+			"2526_I_INF_FISE_S03_PR_RIE_PRJ": 1,
 			"2526_I_INF_FISE_S03_PR_SEM": 1
 		};
 	}));
@@ -1164,6 +1166,7 @@
 			}
 		}
 		for (const mod of marks) {
+			const hasOverrides = mod.subjects.some((s) => s._overridden);
 			for (const sub of mod.subjects) {
 				const ratt = sub.marks.find((m) => m._code?.endsWith("_RATT") && m.value != null && m.value !== .01);
 				if (ratt) {
@@ -1180,7 +1183,7 @@
 						subWeight += mark.coefficient;
 					}
 					sub.average = subWeight > 0 ? subTotal / subWeight : null;
-					if (!sub._overridden) sub.coefficient = subWeight || 1;
+					if (!sub._overridden && !hasOverrides) sub.coefficient = subWeight || 1;
 					if (subWeight > 0) for (const mark of sub.marks) {
 						mark._rawCoefficient = mark.coefficient;
 						mark.coefficient /= subWeight;

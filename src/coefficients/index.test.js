@@ -274,14 +274,27 @@ describe('applyCoefficients', () => {
         expect(marks[0].subjects[0].marks[0]._rawCoefficient).toBe(1);
     });
 
-    it('computes equal average when all coefficients are 1', () => {
+    it('uses raw mark-weight sums when no overrides (Auriga mode)', () => {
         const marks = makeMarks();
         const { average } = applyCoefficients(marks, null);
 
-        // CS avg = (15+12)/2 = 13.5, weight 2
-        // PR avg = 18, weight 1
+        // No overrides → subjects use subWeight as coefficient
+        // CS avg = (15+12)/2 = 13.5, subWeight 2
+        // PR avg = 18, subWeight 1
         // Overall = (13.5*2 + 18*1) / 3 = 45/3 = 15
         expect(average).toBeCloseTo(15);
+    });
+
+    it('defaults non-overridden subjects to coef 1 when siblings have overrides', () => {
+        const marks = makeMarks();
+        // Override only CS, leave PR as-is
+        const overrides = new Map([['2526_I_INF_FISA_S07_CS', 5]]);
+        applyCoefficients(marks, overrides);
+
+        // CS subject has override → coef stays from override context
+        // PR module has no overrides → uses subWeight (Auriga mode)
+        expect(marks[0].coefficient).toBe(5);
+        expect(marks[0]._overridden).toBe(true);
     });
 
     it('handles null overrides gracefully', () => {

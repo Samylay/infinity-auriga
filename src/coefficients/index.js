@@ -221,6 +221,11 @@ export function applyCoefficients(marks, overrides) {
 
     // Bottom-up: marks → subjects → modules → overall
     for (const mod of marks) {
+        // If any subject in this module has an ECTS override, use override mode:
+        // non-overridden subjects default to coef 1 (avoids mixing ECTS with raw API sums).
+        // Otherwise, use Auriga's raw mark-weight sums as subject coefficients.
+        const hasOverrides = mod.subjects.some(s => s._overridden);
+
         for (const sub of mod.subjects) {
             // Rattrapage (_RATT) replaces 100% of the ECUE average
             const ratt = sub.marks.find(m => m._code?.endsWith('_RATT') && m.value != null && m.value !== 0.01);
@@ -241,7 +246,7 @@ export function applyCoefficients(marks, overrides) {
                     }
                 }
                 sub.average = subWeight > 0 ? subTotal / subWeight : null;
-                if (!sub._overridden) sub.coefficient = subWeight || 1;
+                if (!sub._overridden && !hasOverrides) sub.coefficient = subWeight || 1;
                 if (subWeight > 0) {
                     for (const mark of sub.marks) {
                         mark._rawCoefficient = mark.coefficient;
