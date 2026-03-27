@@ -116,10 +116,16 @@ export function renderApp(container, { name, marks, averages, filters, filtersVa
     container.appendChild(h('div', { id: 'content', class: 'variable wide' },
         h('div', { id: 'header' },
             html('div', { id: 'logo', class: 'variable' }, LogoSvg),
-            ...(name ? [h('a', { id: 'logout', href: '#', onclick: (e) => {
-                e.preventDefault();
-                window.location.href = 'https://ionisepita-auth.np-auriga.nfrance.net/auth/realms/npionisepita/protocol/openid-connect/logout?post_logout_redirect_uri=' + encodeURIComponent('https://auriga.epita.fr');
-            } }, 'Se deconnecter')] : [])
+            ...(name ? [h('div', { class: 'header-actions' },
+                h('a', { id: 'export-btn', href: '#', onclick: (e) => { e.preventDefault(); window.print(); } },
+                    html('span', { class: 'export-icon' }, '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>'),
+                    'PDF',
+                ),
+                h('a', { id: 'logout', href: '#', onclick: (e) => {
+                    e.preventDefault();
+                    window.location.href = 'https://ionisepita-auth.np-auriga.nfrance.net/auth/realms/npionisepita/protocol/openid-connect/logout?post_logout_redirect_uri=' + encodeURIComponent('https://auriga.epita.fr');
+                } }, 'Se deconnecter'),
+            )] : [])
         ),
         h('div', { id: 'main' },
             h('div', { class: 'content' },
