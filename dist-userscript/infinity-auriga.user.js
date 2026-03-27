@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Infinity Auriga
 // @namespace    infinity-auriga
-// @version      1.8.0
+// @version      1.9.0
 // @description  Make Auriga Great Again - enhanced grades UI for EPITA
 // @author       KazeTachinuu & contributors
 // @match        https://auriga.epita.fr/*
@@ -831,6 +831,46 @@
 		return updates.filter((u) => new Date(u.date).getTime() > cutoff);
 	}
 	//#endregion
+	//#region coefficients/s03_2526_fise.js
+	var s03_2526_fise_exports = /* @__PURE__ */ __exportAll({
+		default: () => s03_2526_fise_default,
+		meta: () => meta$2
+	});
+	var meta$2, s03_2526_fise_default;
+	var init_s03_2526_fise = __esmMin((() => {
+		meta$2 = {
+			semester: "S03",
+			year: "2526",
+			track: "FISE",
+			major: null,
+			name: "Formation initiale"
+		};
+		s03_2526_fise_default = {
+			"2526_I_INF_FISE_S03_AG": 1,
+			"2526_I_INF_FISE_S03_AG_ANAC": 1,
+			"2526_I_INF_FISE_S03_AG_COM3": 3,
+			"2526_I_INF_FISE_S03_AG_COM4": 3,
+			"2526_I_INF_FISE_S03_AG_ET1": 3,
+			"2526_I_INF_FISE_S03_AG_ET2": 3,
+			"2526_I_INF_FISE_S03_AG_HC": 3,
+			"2526_I_INF_FISE_S03_AG_LR": 3,
+			"2526_I_INF_FISE_S03_CN": 1,
+			"2526_I_INF_FISE_S03_CN_ELM": 1,
+			"2526_I_INF_FISE_S03_CN_PC_AL": 3,
+			"2526_I_INF_FISE_S03_CN_PC_ASN": 2,
+			"2526_I_INF_FISE_S03_CN_PC_PSE": 2,
+			"2526_I_INF_FISE_S03_CN_QUANT": 1,
+			"2526_I_INF_FISE_S03_CN_THLR": 1,
+			"2526_I_INF_FISE_S03_PR": 1,
+			"2526_I_INF_FISE_S03_PR_AR2": 3,
+			"2526_I_INF_FISE_S03_PR_BA": 3,
+			"2526_I_INF_FISE_S03_PR_GM": 2,
+			"2526_I_INF_FISE_S03_PR_GRAPHS": 3,
+			"2526_I_INF_FISE_S03_PR_NAC": 3,
+			"2526_I_INF_FISE_S03_PR_SEM": 1
+		};
+	}));
+	//#endregion
 	//#region coefficients/s07_2526_fisa_cs.js
 	var s07_2526_fisa_cs_exports = /* @__PURE__ */ __exportAll({
 		default: () => s07_2526_fisa_cs_default,
@@ -905,7 +945,10 @@
 	//#endregion
 	//#region src/coefficients/index.js
 	/** Coefficient override system — applies community-contributed ECTS weights to Auriga's flat grades. */
-	var modules = /* @__PURE__ */ Object.assign({
+	var CDN_BASE = `https://cdn.jsdelivr.net/gh/KazeTachinuu/infinity-auriga@master/coefficients`;
+	/** Bundled coefficients as fallback when CDN is unreachable. */
+	var bundled = /* @__PURE__ */ Object.assign({
+		"../../coefficients/s03_2526_fise.js": () => Promise.resolve().then(() => (init_s03_2526_fise(), s03_2526_fise_exports)),
 		"../../coefficients/s07_2526_fisa_cs.js": () => Promise.resolve().then(() => (init_s07_2526_fisa_cs(), s07_2526_fisa_cs_exports)),
 		"../../coefficients/s07_2526_fisa_dev.js": () => Promise.resolve().then(() => (init_s07_2526_fisa_dev(), s07_2526_fisa_dev_exports))
 	});
@@ -920,28 +963,92 @@
 			major: parts[3]?.toUpperCase() || null
 		};
 	}
-	/** Load coefficients for a semester/track/major. Major-specific first, then track-only fallback. */
+	/** Parse raw JS module text into { meta, default } without eval. */
+	function parseModuleText(text) {
+		const clean = text.replace(/\/\/.*$/gm, "").replace(/\/\*[\s\S]*?\*\//g, "");
+		const extractObject = (prefix) => {
+			const idx = clean.indexOf(prefix);
+			if (idx === -1) return null;
+			const start = clean.indexOf("{", idx);
+			if (start === -1) return null;
+			let depth = 0, end = start;
+			for (; end < clean.length; end++) if (clean[end] === "{") depth++;
+			else if (clean[end] === "}") {
+				depth--;
+				if (depth === 0) break;
+			}
+			const raw = clean.slice(start, end + 1).replace(/'/g, "\"").replace(/(\w+)\s*:/g, "\"$1\":").replace(/,\s*([}\]])/g, "$1");
+			return JSON.parse(raw);
+		};
+		return {
+			meta: extractObject("const meta"),
+			default: extractObject("export default")
+		};
+	}
+	/** Build the expected filename for a semester/track/major combo. */
+	function buildFilename(semester, year, track, major) {
+		const parts = [
+			semester.toLowerCase(),
+			year,
+			track.toLowerCase()
+		];
+		if (major) parts.push(major.toLowerCase());
+		return parts.join("_") + ".js";
+	}
+	/** Try fetching a coefficient file from jsDelivr CDN. */
+	async function fetchRemote(filename) {
+		const url = `${CDN_BASE}/${filename}`;
+		const res = await fetch(url);
+		if (!res.ok) return null;
+		return parseModuleText(await res.text());
+	}
+	/** Try loading from bundled import.meta.glob. */
+	async function loadBundled(semester, year, track, wantMajor) {
+		const hit = Object.entries(bundled).find(([path]) => {
+			const f = parseFilename(path);
+			if (!f) return false;
+			return f.semester === semester && f.year === year && f.track === track && (wantMajor ? f.major?.toLowerCase() === wantMajor : !f.major);
+		});
+		if (!hit) return null;
+		const mod = await hit[1]();
+		return {
+			meta: mod.meta,
+			default: mod.default,
+			file: hit[0].replace(/^.*\//, "")
+		};
+	}
+	/** Load coefficients for a semester/track/major. Tries CDN first, falls back to bundled. */
 	async function loadCoefficients(semesterKey, track, major = null) {
 		const [semester, year] = semesterKey.split("_");
-		const candidates = Object.entries(modules);
 		const passes = major ? [major.toLowerCase(), null] : [null];
 		for (const wantMajor of passes) {
-			const hit = candidates.find(([path]) => {
-				const f = parseFilename(path);
-				if (!f) return false;
-				return f.semester === semester && f.year === year && f.track === track && (wantMajor ? f.major?.toLowerCase() === wantMajor : !f.major);
-			});
-			if (!hit) continue;
-			const [path, loader] = hit;
-			const mod = await loader();
-			const { meta } = mod;
-			if (!meta) continue;
-			if (!(meta.semester?.toUpperCase() === semester && meta.year === year && meta.track?.toUpperCase() === track && (wantMajor ? meta.major?.toLowerCase() === wantMajor : !meta.major))) continue;
-			return {
-				overrides: new Map(Object.entries(mod.default)),
-				file: path.replace(/^.*\//, ""),
-				meta
-			};
+			const filename = buildFilename(semester, year, track, wantMajor);
+			try {
+				const mod = await fetchRemote(filename);
+				if (mod?.meta && mod.default) {
+					const { meta } = mod;
+					if (meta.semester?.toUpperCase() === semester && meta.year === year && meta.track?.toUpperCase() === track && (wantMajor ? meta.major?.toLowerCase() === wantMajor : !meta.major)) {
+						console.log(`[Infinity] Loaded coefficients from CDN: ${filename}`);
+						return {
+							overrides: new Map(Object.entries(mod.default)),
+							file: filename,
+							meta
+						};
+					}
+				}
+			} catch {}
+			const local = await loadBundled(semester, year, track, wantMajor);
+			if (local?.meta) {
+				const { meta } = local;
+				if (meta.semester?.toUpperCase() === semester && meta.year === year && meta.track?.toUpperCase() === track && (wantMajor ? meta.major?.toLowerCase() === wantMajor : !meta.major)) {
+					console.log(`[Infinity] Loaded coefficients from bundle: ${local.file}`);
+					return {
+						overrides: new Map(Object.entries(local.default)),
+						file: local.file,
+						meta
+					};
+				}
+			}
 		}
 		return null;
 	}
@@ -1173,7 +1280,7 @@
 	//#region package.json
 	var version;
 	var init_package = __esmMin((() => {
-		version = "1.8.0";
+		version = "1.9.0";
 	}));
 	//#endregion
 	//#region src/app.js

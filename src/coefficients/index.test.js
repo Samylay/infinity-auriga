@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { generateTemplate, applyCoefficients, parseFilename } from './index.js';
+import { generateTemplate, applyCoefficients, parseFilename, parseModuleText, buildFilename } from './index.js';
 import { detectMajor } from '../session.js';
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
 
 // Minimal grade tree matching the structure built by buildGradeTree
 function makeMarks() {
@@ -97,6 +99,71 @@ describe('detectMajor', () => {
             }],
         }];
         expect(detectMajor(marks)).toBeNull();
+    });
+});
+
+describe('buildFilename', () => {
+    it('builds filename with major', () => {
+        expect(buildFilename('S07', '2526', 'FISA', 'cs')).toBe('s07_2526_fisa_cs.js');
+    });
+
+    it('builds filename without major', () => {
+        expect(buildFilename('S03', '2526', 'FISE', null)).toBe('s03_2526_fise.js');
+    });
+});
+
+describe('parseModuleText', () => {
+    it('parses a simple coefficient file', () => {
+        const text = `
+export const meta = {
+    semester: 'S03',
+    year: '2526',
+    track: 'FISE',
+    major: null,
+    name: 'Formation initiale',
+};
+
+export default {
+    '2526_I_INF_FISE_S03_CN': 3,    // Concevoir
+    '2526_I_INF_FISE_S03_PR': 2,    // Produire
+};`;
+        const result = parseModuleText(text);
+        expect(result.meta).toEqual({
+            semester: 'S03', year: '2526', track: 'FISE', major: null, name: 'Formation initiale',
+        });
+        expect(result.default).toEqual({
+            '2526_I_INF_FISE_S03_CN': 3,
+            '2526_I_INF_FISE_S03_PR': 2,
+        });
+    });
+
+    it('parses a real coefficient file with comments and object values', () => {
+        const text = readFileSync(resolve(import.meta.dirname, '../../coefficients/s07_2526_fisa_cs.js'), 'utf-8');
+        const result = parseModuleText(text);
+
+        expect(result.meta.semester).toBe('S07');
+        expect(result.meta.track).toBe('FISA');
+        expect(result.meta.major).toBe('CS');
+        expect(result.default['2526_I_INF_FISA_S07_AEE']).toBe(8);
+        expect(result.default['2526_I_INF_FISA_S07_CN']).toBe(3);
+        expect(result.default['2526_I_INF_FISA_S07_PR_42SH']).toEqual({ ects: 2, module: 'SAE 42SH', name: 'Projet Shell' });
+    });
+
+    it('parses the s03 FISE coefficient file', () => {
+        const text = readFileSync(resolve(import.meta.dirname, '../../coefficients/s03_2526_fise.js'), 'utf-8');
+        const result = parseModuleText(text);
+
+        expect(result.meta.semester).toBe('S03');
+        expect(result.meta.track).toBe('FISE');
+        expect(result.meta.major).toBeNull();
+        expect(result.default['2526_I_INF_FISE_S03_CN']).toBe(1);
+        expect(result.default['2526_I_INF_FISE_S03_CN_PC_AL']).toBe(3);
+    });
+
+    it('returns null for missing sections', () => {
+        const result = parseModuleText('const x = 5;');
+        expect(result.meta).toBeNull();
+        expect(result.default).toBeNull();
     });
 });
 

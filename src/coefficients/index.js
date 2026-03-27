@@ -1,6 +1,9 @@
 /** Coefficient override system — applies community-contributed ECTS weights to Auriga's flat grades. */
 
-const modules = import.meta.glob('../../coefficients/*.js');
+const CDN_BASE = `https://cdn.jsdelivr.net/gh/KazeTachinuu/infinity-auriga@master/coefficients`;
+
+/** Bundled coefficients as fallback when CDN is unreachable. */
+const bundled = import.meta.glob('../../coefficients/*.js');
 
 /** Parse filename: s07_2526_fisa_cs.js → { semester, year, track, major } */
 export function parseFilename(path) {
@@ -15,36 +18,93 @@ export function parseFilename(path) {
     };
 }
 
-/** Load coefficients for a semester/track/major. Major-specific first, then track-only fallback. */
+/** Parse raw JS module text into { meta, default } without eval. */
+export function parseModuleText(text) {
+    // Strip comments
+    const clean = text.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
+    const extractObject = (prefix) => {
+        const idx = clean.indexOf(prefix);
+        if (idx === -1) return null;
+        const start = clean.indexOf('{', idx);
+        if (start === -1) return null;
+        let depth = 0, end = start;
+        for (; end < clean.length; end++) {
+            if (clean[end] === '{') depth++;
+            else if (clean[end] === '}') { depth--; if (depth === 0) break; }
+        }
+        const raw = clean.slice(start, end + 1)
+            .replace(/'/g, '"')                    // single → double quotes
+            .replace(/(\w+)\s*:/g, '"$1":')        // unquoted keys
+            .replace(/,\s*([}\]])/g, '$1');         // trailing commas
+        return JSON.parse(raw);
+    };
+    return { meta: extractObject('const meta'), default: extractObject('export default') };
+}
+
+/** Build the expected filename for a semester/track/major combo. */
+export function buildFilename(semester, year, track, major) {
+    const parts = [semester.toLowerCase(), year, track.toLowerCase()];
+    if (major) parts.push(major.toLowerCase());
+    return parts.join('_') + '.js';
+}
+
+/** Try fetching a coefficient file from jsDelivr CDN. */
+async function fetchRemote(filename) {
+    const url = `${CDN_BASE}/${filename}`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const text = await res.text();
+    return parseModuleText(text);
+}
+
+/** Try loading from bundled import.meta.glob. */
+async function loadBundled(semester, year, track, wantMajor) {
+    const hit = Object.entries(bundled).find(([path]) => {
+        const f = parseFilename(path);
+        if (!f) return false;
+        return f.semester === semester && f.year === year && f.track === track
+            && (wantMajor ? f.major?.toLowerCase() === wantMajor : !f.major);
+    });
+    if (!hit) return null;
+    const mod = await hit[1]();
+    return { meta: mod.meta, default: mod.default, file: hit[0].replace(/^.*\//, '') };
+}
+
+/** Load coefficients for a semester/track/major. Tries CDN first, falls back to bundled. */
 export async function loadCoefficients(semesterKey, track, major = null) {
     const [semester, year] = semesterKey.split('_');
-    const candidates = Object.entries(modules);
     const passes = major ? [major.toLowerCase(), null] : [null];
 
     for (const wantMajor of passes) {
-        const hit = candidates.find(([path]) => {
-            const f = parseFilename(path);
-            if (!f) return false;
-            return f.semester === semester && f.year === year && f.track === track
-                && (wantMajor ? f.major?.toLowerCase() === wantMajor : !f.major);
-        });
-        if (!hit) continue;
+        const filename = buildFilename(semester, year, track, wantMajor);
 
-        const [path, loader] = hit;
-        const mod = await loader();
-        const { meta } = mod;
-        if (!meta) continue;
+        // Try remote first
+        try {
+            const mod = await fetchRemote(filename);
+            if (mod?.meta && mod.default) {
+                const { meta } = mod;
+                const metaOk = meta.semester?.toUpperCase() === semester
+                    && meta.year === year && meta.track?.toUpperCase() === track
+                    && (wantMajor ? meta.major?.toLowerCase() === wantMajor : !meta.major);
+                if (metaOk) {
+                    console.log(`[Infinity] Loaded coefficients from CDN: ${filename}`);
+                    return { overrides: new Map(Object.entries(mod.default)), file: filename, meta };
+                }
+            }
+        } catch { /* CDN unavailable, try bundled */ }
 
-        const metaOk = meta.semester?.toUpperCase() === semester
-            && meta.year === year && meta.track?.toUpperCase() === track
-            && (wantMajor ? meta.major?.toLowerCase() === wantMajor : !meta.major);
-        if (!metaOk) continue;
-
-        return {
-            overrides: new Map(Object.entries(mod.default)),
-            file: path.replace(/^.*\//, ''),
-            meta,
-        };
+        // Fallback to bundled
+        const local = await loadBundled(semester, year, track, wantMajor);
+        if (local?.meta) {
+            const { meta } = local;
+            const metaOk = meta.semester?.toUpperCase() === semester
+                && meta.year === year && meta.track?.toUpperCase() === track
+                && (wantMajor ? meta.major?.toLowerCase() === wantMajor : !meta.major);
+            if (metaOk) {
+                console.log(`[Infinity] Loaded coefficients from bundle: ${local.file}`);
+                return { overrides: new Map(Object.entries(local.default)), file: local.file, meta };
+            }
+        }
     }
     return null;
 }
