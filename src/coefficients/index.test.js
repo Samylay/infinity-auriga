@@ -289,4 +289,52 @@ describe('applyCoefficients', () => {
         const { average } = applyCoefficients(marks, null);
         expect(average).toBeCloseTo(15);
     });
+
+    it('rattrapage replaces 100% of subject average', () => {
+        const marks = [{
+            id: 'CN', _code: '2526_I_INF_FISE_S03_CN', name: 'Concevoir',
+            average: null, classAverage: null, coefficient: 1,
+            subjects: [{
+                id: 'PC_ASN', _code: '2526_I_INF_FISE_S03_CN_PC_ASN', name: 'Analyse',
+                average: null, classAverage: null, coefficient: 1,
+                marks: [
+                    { id: 0, _code: '2526_I_INF_FISE_S03_CN_PC_ASN_EXA_1', name: '3 QCM', value: 5.67, classAverage: null, coefficient: 20 },
+                    { id: 1, _code: '2526_I_INF_FISE_S03_CN_PC_ASN_EXA_2', name: 'CC1', value: 13, classAverage: null, coefficient: 30 },
+                    { id: 2, _code: '2526_I_INF_FISE_S03_CN_PC_ASN_EXF', name: 'Examen', value: 5.50, classAverage: null, coefficient: 50 },
+                    { id: 3, _code: '2526_I_INF_FISE_S03_CN_PC_ASN_RATT', name: 'rattrapage', value: 11.50, classAverage: null, coefficient: 1 },
+                ],
+            }],
+        }];
+
+        applyCoefficients(marks, null);
+
+        // Rattrapage replaces entire subject average
+        expect(marks[0].subjects[0].average).toBeCloseTo(11.50);
+        expect(marks[0].subjects[0]._ratt).toBe(true);
+        // Rattrapage mark gets weight 1, others get 0
+        expect(marks[0].subjects[0].marks[3].coefficient).toBe(1);
+        expect(marks[0].subjects[0].marks[0].coefficient).toBe(0);
+    });
+
+    it('does not apply rattrapage logic when RATT has no value', () => {
+        const marks = [{
+            id: 'CN', _code: '2526_I_INF_FISE_S03_CN', name: 'Concevoir',
+            average: null, classAverage: null, coefficient: 1,
+            subjects: [{
+                id: 'PC_ASN', _code: '2526_I_INF_FISE_S03_CN_PC_ASN', name: 'Analyse',
+                average: null, classAverage: null, coefficient: 1,
+                marks: [
+                    { id: 0, _code: '2526_I_INF_FISE_S03_CN_PC_ASN_EXA_1', name: 'QCM', value: 10, classAverage: null, coefficient: 50 },
+                    { id: 1, _code: '2526_I_INF_FISE_S03_CN_PC_ASN_EXF', name: 'Examen', value: 8, classAverage: null, coefficient: 50 },
+                    { id: 2, _code: '2526_I_INF_FISE_S03_CN_PC_ASN_RATT', name: 'rattrapage', value: null, classAverage: null, coefficient: 1 },
+                ],
+            }],
+        }];
+
+        applyCoefficients(marks, null);
+
+        // No rattrapage value → normal weighted average
+        expect(marks[0].subjects[0].average).toBeCloseTo(9);
+        expect(marks[0].subjects[0]._ratt).toBeUndefined();
+    });
 });

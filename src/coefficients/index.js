@@ -222,19 +222,31 @@ export function applyCoefficients(marks, overrides) {
     // Bottom-up: marks → subjects → modules → overall
     for (const mod of marks) {
         for (const sub of mod.subjects) {
-            let subTotal = 0, subWeight = 0;
-            for (const mark of sub.marks) {
-                if (mark.value != null && mark.value !== 0.01) { // 0.01 = justified absence
-                    subTotal += mark.value * mark.coefficient;
-                    subWeight += mark.coefficient;
-                }
-            }
-            sub.average = subWeight > 0 ? subTotal / subWeight : null;
-            if (!sub._overridden) sub.coefficient = subWeight || 1;
-            if (subWeight > 0) {
+            // Rattrapage (_RATT) replaces 100% of the ECUE average
+            const ratt = sub.marks.find(m => m._code?.endsWith('_RATT') && m.value != null && m.value !== 0.01);
+            if (ratt) {
+                sub.average = ratt.value;
+                sub._ratt = true;
+                // Show rattrapage as 100% weight, others as 0%
                 for (const mark of sub.marks) {
                     mark._rawCoefficient = mark.coefficient;
-                    mark.coefficient /= subWeight;
+                    mark.coefficient = mark === ratt ? 1 : 0;
+                }
+            } else {
+                let subTotal = 0, subWeight = 0;
+                for (const mark of sub.marks) {
+                    if (mark.value != null && mark.value !== 0.01) { // 0.01 = justified absence
+                        subTotal += mark.value * mark.coefficient;
+                        subWeight += mark.coefficient;
+                    }
+                }
+                sub.average = subWeight > 0 ? subTotal / subWeight : null;
+                if (!sub._overridden) sub.coefficient = subWeight || 1;
+                if (subWeight > 0) {
+                    for (const mark of sub.marks) {
+                        mark._rawCoefficient = mark.coefficient;
+                        mark.coefficient /= subWeight;
+                    }
                 }
             }
         }

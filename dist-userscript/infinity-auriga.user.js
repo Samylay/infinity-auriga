@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Infinity Auriga
 // @namespace    infinity-auriga
-// @version      1.9.2
+// @version      1.9.3
 // @description  Make Auriga Great Again - enhanced grades UI for EPITA
 // @author       KazeTachinuu & contributors
 // @match        https://auriga.epita.fr/*
@@ -834,7 +834,7 @@
 	//#region package.json
 	var version;
 	var init_package = __esmMin((() => {
-		version = "1.9.2";
+		version = "1.9.3";
 	}));
 	//#endregion
 	//#region src/app.js
@@ -1165,16 +1165,26 @@
 		}
 		for (const mod of marks) {
 			for (const sub of mod.subjects) {
-				let subTotal = 0, subWeight = 0;
-				for (const mark of sub.marks) if (mark.value != null && mark.value !== .01) {
-					subTotal += mark.value * mark.coefficient;
-					subWeight += mark.coefficient;
-				}
-				sub.average = subWeight > 0 ? subTotal / subWeight : null;
-				if (!sub._overridden) sub.coefficient = subWeight || 1;
-				if (subWeight > 0) for (const mark of sub.marks) {
-					mark._rawCoefficient = mark.coefficient;
-					mark.coefficient /= subWeight;
+				const ratt = sub.marks.find((m) => m._code?.endsWith("_RATT") && m.value != null && m.value !== .01);
+				if (ratt) {
+					sub.average = ratt.value;
+					sub._ratt = true;
+					for (const mark of sub.marks) {
+						mark._rawCoefficient = mark.coefficient;
+						mark.coefficient = mark === ratt ? 1 : 0;
+					}
+				} else {
+					let subTotal = 0, subWeight = 0;
+					for (const mark of sub.marks) if (mark.value != null && mark.value !== .01) {
+						subTotal += mark.value * mark.coefficient;
+						subWeight += mark.coefficient;
+					}
+					sub.average = subWeight > 0 ? subTotal / subWeight : null;
+					if (!sub._overridden) sub.coefficient = subWeight || 1;
+					if (subWeight > 0) for (const mark of sub.marks) {
+						mark._rawCoefficient = mark.coefficient;
+						mark.coefficient /= subWeight;
+					}
 				}
 			}
 			let modTotal = 0, modWeight = 0;
