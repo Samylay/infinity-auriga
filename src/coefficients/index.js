@@ -2,7 +2,7 @@
 
 import { app } from '../app.js';
 
-const CDN_BASE = `${app.cdnBase}/coefficients`;
+const CDN_BASE = `${app.rawBase}/coefficients`;
 
 /** Bundled coefficients as fallback when CDN is unreachable. */
 const bundled = import.meta.glob('../../coefficients/*.js');

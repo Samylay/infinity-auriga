@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Infinity Auriga
 // @namespace    infinity-auriga
-// @version      1.9.4
+// @version      1.9.5
 // @description  Make Auriga Great Again - enhanced grades UI for EPITA
 // @author       KazeTachinuu & contributors
 // @match        https://auriga.epita.fr/*
@@ -834,7 +834,7 @@
 	//#region package.json
 	var version;
 	var init_package = __esmMin((() => {
-		version = "1.9.4";
+		version = "1.9.5";
 	}));
 	//#endregion
 	//#region src/app.js
@@ -845,7 +845,7 @@
 			name: "Infinity Auriga",
 			version,
 			repository: "https://github.com/KazeTachinuu/infinity-auriga",
-			cdnBase: "https://cdn.jsdelivr.net/gh/KazeTachinuu/infinity-auriga@master"
+			rawBase: "https://raw.githubusercontent.com/KazeTachinuu/infinity-auriga/master"
 		};
 	}));
 	//#endregion
@@ -965,7 +965,7 @@
 	//#endregion
 	//#region src/coefficients/index.js
 	init_app$1();
-	var CDN_BASE = `${app.cdnBase}/coefficients`;
+	var CDN_BASE = `${app.rawBase}/coefficients`;
 	/** Bundled coefficients as fallback when CDN is unreachable. */
 	var bundled = /* @__PURE__ */ Object.assign({
 		"../../coefficients/s03_2526_fise.js": () => Promise.resolve().then(() => (init_s03_2526_fise(), s03_2526_fise_exports)),
@@ -1672,7 +1672,7 @@
 	*/
 	async function checkForUpdate() {
 		try {
-			const res = await fetch(`${app.cdnBase}/package.json`, { cache: "no-cache" });
+			const res = await fetch(`${app.rawBase}/package.json`, { cache: "no-cache" });
 			if (!res.ok) return { available: false };
 			const pkg = await res.json();
 			if (isNewer(pkg.version, app.version)) return {
