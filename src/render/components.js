@@ -95,19 +95,18 @@ export function renderSubject(subject, moduleId) {
     const metaParts = [];
     if (subject.classAverage != null) metaParts.push(`promo: ${formatGrade(subject.classAverage)}`);
     if (!subject._overridden && subject.coefficient != null && subject.coefficient !== 1) metaParts.push(`coeff. ${formatGrade(subject.coefficient)}`);
-    const subOverriddenEl = subject._overridden
-        ? h('span', { class: 'coeff-badge coef' }, `coef. ${subject.coefficient}`)
-        : null;
+
+    const bottomChildren = [h('div', { class: 'average' }, gradeSpan(subject.average), '\u00a0/ 20')];
+    if (metaParts.length || subject._overridden) {
+        const metaChildren = [];
+        if (metaParts.length) metaChildren.push(`(${metaParts.join(', ')})`);
+        if (subject._overridden) metaChildren.push(h('span', { class: 'coeff-badge coef' }, `coef. ${subject.coefficient}`));
+        bottomChildren.push(h('div', { class: 'class-average' }, ...metaChildren));
+    }
 
     const info = h('div', { class: 'info' },
         h('div', { class: 'top' }, h('div', { class: 'id' }, copyCodeEl(subject._code, codeLabel))),
-        h('div', { class: 'bottom' },
-            h('div', { class: 'average' }, gradeSpan(subject.average), '\u00a0/ 20'),
-            ...(metaParts.length || subOverriddenEl ? [h('div', { class: 'class-average' },
-                ...(metaParts.length ? [`(${metaParts.join(', ')})`] : []),
-                ...(subOverriddenEl ? [subOverriddenEl] : [])
-            )] : [])
-        ),
+        h('div', { class: 'bottom' }, ...bottomChildren),
         h('hr', { class: 'bottom-line' })
     );
 
@@ -116,9 +115,7 @@ export function renderSubject(subject, moduleId) {
         const meta = [];
         if (mark.classAverage != null) meta.push(`moyenne: ${formatGrade(mark.classAverage)}`);
         if (!hasEqualCoefficients(subject) && !mark._overridden) meta.push(`${Math.round(mark.coefficient * 100)}%`);
-        const overriddenEl = mark._overridden && mark._rawCoefficient != null
-            ? h('span', { class: 'coeff-badge coef' }, `coef. ${mark._rawCoefficient}`)
-            : null;
+        const hasOverride = mark._overridden && mark._rawCoefficient != null;
 
         // Strip subject/group name prefix from mark name to avoid redundancy
         let markName = mark.name;
@@ -128,18 +125,23 @@ export function renderSubject(subject, moduleId) {
             else if (markName.startsWith(prefix + ' ')) markName = markName.slice(prefix.length + 1);
         }
 
-        return h('div', { class: 'mark' },
+        const markChildren = [
             h('div', { class: 'point' }),
             h('div', { class: 'line' },
                 h('div', { class: 'name' }, copyCodeEl(mark._code, markName)),
                 '\u00a0:\u00a0',
                 h('div', { class: 'value' }, h('span', { class: 'itself', style: { color: gradeColor(mark.value) } }, formatGrade(mark.value)), '\u00a0/ 20')
             ),
-            ...(meta.length || overriddenEl ? [h('div', { class: 'class-average' },
-                ...(meta.length ? [h('span', { class: 'parenthesis' }, '('), meta.join(', '), h('span', { class: 'parenthesis' }, ')')] : []),
-                ...(overriddenEl ? [overriddenEl] : [])
-            )] : [])
-        );
+        ];
+
+        if (meta.length || hasOverride) {
+            const metaChildren = [];
+            if (meta.length) metaChildren.push(h('span', { class: 'parenthesis' }, '('), meta.join(', '), h('span', { class: 'parenthesis' }, ')'));
+            if (hasOverride) metaChildren.push(h('span', { class: 'coeff-badge coef' }, `coef. ${mark._rawCoefficient}`));
+            markChildren.push(h('div', { class: 'class-average' }, ...metaChildren));
+        }
+
+        return h('div', { class: 'mark' }, ...markChildren);
     }
 
     // Build marks list, inserting group headers when _group changes

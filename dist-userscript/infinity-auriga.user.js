@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Infinity Auriga
 // @namespace    infinity-auriga
-// @version      1.9.5
+// @version      1.9.6
 // @description  Make Auriga Great Again - enhanced grades UI for EPITA
 // @author       KazeTachinuu & contributors
 // @match        https://auriga.epita.fr/*
@@ -834,7 +834,7 @@
 	//#region package.json
 	var version;
 	var init_package = __esmMin((() => {
-		version = "1.9.5";
+		version = "1.9.6";
 	}));
 	//#endregion
 	//#region src/app.js
@@ -1552,27 +1552,36 @@
 		const metaParts = [];
 		if (subject.classAverage != null) metaParts.push(`promo: ${formatGrade(subject.classAverage)}`);
 		if (!subject._overridden && subject.coefficient != null && subject.coefficient !== 1) metaParts.push(`coeff. ${formatGrade(subject.coefficient)}`);
-		const subOverriddenEl = subject._overridden ? h("span", { class: "coeff-badge coef" }, `coef. ${subject.coefficient}`) : null;
-		const info = h("div", { class: "info" }, h("div", { class: "top" }, h("div", { class: "id" }, copyCodeEl(subject._code, codeLabel))), h("div", { class: "bottom" }, h("div", { class: "average" }, gradeSpan(subject.average), "\xA0/ 20"), ...metaParts.length || subOverriddenEl ? [h("div", { class: "class-average" }, ...metaParts.length ? [`(${metaParts.join(", ")})`] : [], ...subOverriddenEl ? [subOverriddenEl] : [])] : []), h("hr", { class: "bottom-line" }));
+		const bottomChildren = [h("div", { class: "average" }, gradeSpan(subject.average), "\xA0/ 20")];
+		if (metaParts.length || subject._overridden) {
+			const metaChildren = [];
+			if (metaParts.length) metaChildren.push(`(${metaParts.join(", ")})`);
+			if (subject._overridden) metaChildren.push(h("span", { class: "coeff-badge coef" }, `coef. ${subject.coefficient}`));
+			bottomChildren.push(h("div", { class: "class-average" }, ...metaChildren));
+		}
+		const info = h("div", { class: "info" }, h("div", { class: "top" }, h("div", { class: "id" }, copyCodeEl(subject._code, codeLabel))), h("div", { class: "bottom" }, ...bottomChildren), h("hr", { class: "bottom-line" }));
 		function renderMark(mark) {
 			const meta = [];
 			if (mark.classAverage != null) meta.push(`moyenne: ${formatGrade(mark.classAverage)}`);
 			if (!hasEqualCoefficients(subject) && !mark._overridden) meta.push(`${Math.round(mark.coefficient * 100)}%`);
-			const overriddenEl = mark._overridden && mark._rawCoefficient != null ? h("span", { class: "coeff-badge coef" }, `coef. ${mark._rawCoefficient}`) : null;
+			const hasOverride = mark._overridden && mark._rawCoefficient != null;
 			let markName = mark.name;
 			const prefix = mark._group || fullName;
 			if (prefix) {
 				if (markName.startsWith(prefix + " - ")) markName = markName.slice(prefix.length + 3);
 				else if (markName.startsWith(prefix + " ")) markName = markName.slice(prefix.length + 1);
 			}
-			return h("div", { class: "mark" }, h("div", { class: "point" }), h("div", { class: "line" }, h("div", { class: "name" }, copyCodeEl(mark._code, markName)), "\xA0:\xA0", h("div", { class: "value" }, h("span", {
+			const markChildren = [h("div", { class: "point" }), h("div", { class: "line" }, h("div", { class: "name" }, copyCodeEl(mark._code, markName)), "\xA0:\xA0", h("div", { class: "value" }, h("span", {
 				class: "itself",
 				style: { color: gradeColor(mark.value) }
-			}, formatGrade(mark.value)), "\xA0/ 20")), ...meta.length || overriddenEl ? [h("div", { class: "class-average" }, ...meta.length ? [
-				h("span", { class: "parenthesis" }, "("),
-				meta.join(", "),
-				h("span", { class: "parenthesis" }, ")")
-			] : [], ...overriddenEl ? [overriddenEl] : [])] : []);
+			}, formatGrade(mark.value)), "\xA0/ 20"))];
+			if (meta.length || hasOverride) {
+				const metaChildren = [];
+				if (meta.length) metaChildren.push(h("span", { class: "parenthesis" }, "("), meta.join(", "), h("span", { class: "parenthesis" }, ")"));
+				if (hasOverride) metaChildren.push(h("span", { class: "coeff-badge coef" }, `coef. ${mark._rawCoefficient}`));
+				markChildren.push(h("div", { class: "class-average" }, ...metaChildren));
+			}
+			return h("div", { class: "mark" }, ...markChildren);
 		}
 		const marksContent = [];
 		let lastGroup = null;
@@ -1776,7 +1785,7 @@
 				e.preventDefault();
 				window.print();
 			}
-		}, html("span", { class: "export-icon" }, "<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"/><polyline points=\"14 2 14 8 20 8\"/><line x1=\"12\" y1=\"18\" x2=\"12\" y2=\"12\"/><polyline points=\"9 15 12 18 15 15\"/></svg>"), "PDF"), h("a", {
+		}, html("span", { class: "export-icon" }, ExportSvg), "PDF"), h("a", {
 			id: "logout",
 			href: "#",
 			onclick: (e) => {
@@ -1822,11 +1831,11 @@
 			if (!btn) return;
 			btn.href = url;
 			btn.target = "_blank";
-			btn.appendChild(html("span", { class: "update-icon" }, "<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M21 2v6h-6\"/><path d=\"M3 12a9 9 0 0 1 15-6.7L21 8\"/><path d=\"M3 22v-6h6\"/><path d=\"M21 12a9 9 0 0 1-15 6.7L3 16\"/></svg>"));
-			btn.appendChild(document.createTextNode("v" + version));
+			btn.append(html("span", { class: "update-icon" }, UpdateSvg), "v" + version);
 			btn.style.display = "";
 		});
 	}
+	var ExportSvg, UpdateSvg;
 	var init_app = __esmMin((() => {
 		init_app$1();
 		init_dom();
@@ -1834,6 +1843,8 @@
 		init_components();
 		init_print();
 		init_version_check();
+		ExportSvg = "<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"/><polyline points=\"14 2 14 8 20 8\"/><line x1=\"12\" y1=\"18\" x2=\"12\" y2=\"12\"/><polyline points=\"9 15 12 18 15 15\"/></svg>";
+		UpdateSvg = "<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M21 2v6h-6\"/><path d=\"M3 12a9 9 0 0 1 15-6.7L21 8\"/><path d=\"M3 22v-6h6\"/><path d=\"M21 12a9 9 0 0 1-15 6.7L3 16\"/></svg>";
 	}));
 	//#endregion
 	//#region src/render/loading.js

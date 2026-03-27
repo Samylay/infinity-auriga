@@ -9,6 +9,9 @@ import { renderComboBox, renderUpdate, renderSubject, renderFooter } from './com
 import { renderPrintView } from './print.js';
 import { checkForUpdate } from '../version-check.js';
 
+const ExportSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>';
+const UpdateSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>';
+
 /**
  * Build the error panel shown in the #background sidebar when the API fails.
  * Adapts its message depending on whether cached grades are available.
@@ -120,9 +123,7 @@ export function renderApp(container, { name, marks, averages, filters, filtersVa
             ...(name ? [h('div', { class: 'header-actions' },
                 h('a', { id: 'update-btn', style: { display: 'none' } }),
                 h('a', { id: 'export-btn', href: '#', onclick: (e) => { e.preventDefault(); window.print(); } },
-                    html('span', { class: 'export-icon' }, '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>'),
-                    'PDF',
-                ),
+                    html('span', { class: 'export-icon' }, ExportSvg), 'PDF'),
                 h('a', { id: 'logout', href: '#', onclick: (e) => {
                     e.preventDefault();
                     window.location.href = 'https://ionisepita-auth.np-auriga.nfrance.net/auth/realms/npionisepita/protocol/openid-connect/logout?post_logout_redirect_uri=' + encodeURIComponent('https://auriga.epita.fr');
@@ -223,8 +224,7 @@ export function renderApp(container, { name, marks, averages, filters, filtersVa
         if (!btn) return;
         btn.href = url;
         btn.target = '_blank';
-        btn.appendChild(html('span', { class: 'update-icon' }, '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>'));
-        btn.appendChild(document.createTextNode('v' + version));
+        btn.append(html('span', { class: 'update-icon' }, UpdateSvg), 'v' + version);
         btn.style.display = '';
     });
 }
